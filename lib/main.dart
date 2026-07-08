@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:morty_app/core/di/injection.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  configureDependencies();
   runApp(const MainApp());
 }
 
