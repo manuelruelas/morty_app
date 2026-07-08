@@ -1,1 +1,36 @@
 include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # Trata los warnings del linter como errores para obligarte a entregar un código impecable
+    todo: ignore
+    missing_required_param: error
+    missing_return: error
+    must_call_super: error
+    invalid_annotation_target: ignore # Necesario si usas Freezed con JsonSerializable
+
+linter:
+  rules:
+    # --- ARQUITECTURA Y BUENAS PRÁCTICAS ---
+    - always_declare_return_types       # Obligatorio declarar qué retorna cada función/método
+    - cancel_subscriptions              # Evita memory leaks (crucial para Streams/Blocs)
+    - close_sinks                       # Cierra correctamente los StreamControllers
+    - avoid_void_async                  # Evita 'void async', prefiere 'Future<void>'
+    - await_only_futures                # No uses await en cosas que no son Futures
+
+    # --- INMUTABILIDAD Y RENDIMIENTO ---
+    - prefer_const_constructors         # Optimiza el renderizado de widgets en Flutter
+    - prefer_const_declarations         # Fuerza el uso de const en valores que no cambian
+    - prefer_final_locals               # Variables locales inmutables por defecto
+    - prefer_final_parameters           # Parámetros de funciones inmutables
+    - avoid_unnecessary_containers      # Evita contenedores vacíos que degradan rendimiento
+
+    # --- ESTILO Y ORDEN (Clean Code) ---
+    - directives_ordering               # Mantiene los imports ordenados (dart, flutter, paquetes, tuyos)
+    - package_api_docs                  # Te ayuda si decides documentar clases públicas
+    - prefer_interpolation_to_compose_strings # Prefiere '${user.name}' sobre 'user.name + ""'
+    - unawaited_futures                 # Te avisa si un Future se ejecuta en background sin manejar
