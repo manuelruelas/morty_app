@@ -53,7 +53,6 @@ class _CharacterListPageState extends State<CharacterListPage> {
 
   @override
   Widget build(final BuildContext context) {
-    final theme = Theme.of(context);
     return BlocProvider(
       create: (final _) => _characterBloc,
       child: Scaffold(
@@ -62,7 +61,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
           actions: [
             IconButton(
               icon: const Icon(Icons.brightness_6),
-              onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+              onPressed: () => context.read<ThemeCubit>().toggleTheme(context),
             ),
           ],
         ),

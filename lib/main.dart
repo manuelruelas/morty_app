@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
+import 'package:morty_app/core/theme/theme_cubit.dart';
 import 'package:morty_app/features/character/presentation/pages/character_list_page.dart';
 
 void main() async {
@@ -13,6 +15,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    return const MaterialApp(home: CharacterListPage());
+    return BlocProvider(
+      create: (final context) => getIt<ThemeCubit>(),
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (final context, final themeMode) {
+          return MaterialApp(
+            themeMode: themeMode,
+            debugShowCheckedModeBanner: false,
+            theme: ThemeCubit.lightTheme,
+            darkTheme: ThemeCubit.darkTheme,
+            home: const CharacterListPage(),
+          );
+        },
+      ),
+    );
   }
 }
