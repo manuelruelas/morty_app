@@ -162,7 +162,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  MaterialPageRoute<void>(
                                     builder: (final context) =>
                                         CharacterDetailPage(
                                           character: character,
