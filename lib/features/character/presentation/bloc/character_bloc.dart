@@ -31,7 +31,7 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
       state.copyWith(
         status: CharacterStatusState.loading,
         currentNameFilter: event.name ?? '',
-        currentStatusFilter: event.status,
+        currentStatusFilter: () => event.status,
         currentPage: 1,
         hasReachedMax: false,
       ),
@@ -59,6 +59,7 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
               status: CharacterStatusState.success,
               characters: characters,
               currentPage: 1,
+              currentStatusFilter: () => event.status,
               hasReachedMax: false,
             ),
           );

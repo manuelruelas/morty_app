@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:morty_app/core/bloc/app_bloc_observer.dart';
 import 'package:morty_app/core/di/injection.dart';
 import 'package:morty_app/core/theme/theme_cubit.dart';
 import 'package:morty_app/features/character/presentation/pages/character_list_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   configureDependencies();
+  Bloc.observer = AppBlocObserver();
   runApp(const MainApp());
 }
 
