@@ -15,7 +15,6 @@ class CharacterDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 💡 ANIMACIÓN HERO: El tag debe coincidir exactamente con el de la tarjeta
             Hero(
               tag: 'character-image-${character.id}',
               child: Image.network(
