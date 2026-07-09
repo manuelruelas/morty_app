@@ -36,7 +36,7 @@ class CharacterState extends Equatable {
     final int? currentPage,
     final bool? hasReachedMax,
     final String? currentNameFilter,
-    final CharacterStatus? currentStatusFilter,
+    final CharacterStatus? Function()? currentStatusFilter,
   }) {
     return CharacterState(
       status: status ?? this.status,
@@ -45,7 +45,9 @@ class CharacterState extends Equatable {
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       currentNameFilter: currentNameFilter ?? this.currentNameFilter,
-      currentStatusFilter: currentStatusFilter ?? this.currentStatusFilter,
+      currentStatusFilter: currentStatusFilter != null
+          ? currentStatusFilter()
+          : this.currentStatusFilter,
     );
   }
 

@@ -87,47 +87,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
                 },
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                children: [
-                  ChoiceChip(
-                    label: const Text('Todos'),
-                    selected: _characterBloc.state.currentStatusFilter == null,
-                    onSelected: (final selected) {
-                      if (selected) {
-                        _characterBloc.add(
-                          GetCharactersEvent(
-                            name: _characterBloc.state.currentNameFilter,
-                            status: null,
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ...CharacterStatus.values.map((final status) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(status.displayName),
-                        selected:
-                            _characterBloc.state.currentStatusFilter == status,
-                        onSelected: (final selected) {
-                          _characterBloc.add(
-                            GetCharactersEvent(
-                              name: _characterBloc.state.currentNameFilter,
-                              status: selected ? status : null,
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
+            const FilterChipsHeader(),
             const SizedBox(height: 12),
             Expanded(
               child: BlocBuilder<CharacterBloc, CharacterState>(
@@ -177,9 +137,10 @@ class _CharacterListPageState extends State<CharacterListPage> {
                         ),
                         controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        itemCount: state.hasReachedMax
-                            ? state.characters.length
-                            : state.characters.length + 1,
+                        itemCount:
+                            state.status == CharacterStatusState.loadingMore
+                            ? state.characters.length + 1
+                            : state.characters.length,
                         itemBuilder: (final context, final index) {
                           if (index >= state.characters.length) {
                             return const Padding(
@@ -211,6 +172,61 @@ class _CharacterListPageState extends State<CharacterListPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class FilterChipsHeader extends StatelessWidget {
+  const FilterChipsHeader({super.key});
+
+  @override
+  Widget build(final BuildContext context) {
+    return BlocSelector<CharacterBloc, CharacterState, CharacterStatus?>(
+      selector: (final state) {
+        return state.currentStatusFilter;
+      },
+      builder: (final context, final state) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              ChoiceChip(
+                label: const Text('Todos'),
+                selected: state == null,
+                onSelected: (final selected) {
+                  final bloc = context.read<CharacterBloc>();
+                  bloc.add(
+                    GetCharactersEvent(
+                      name: bloc.state.currentNameFilter,
+                      status: null,
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+              ...CharacterStatus.values.map((final status) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(status.displayName),
+                    selected: state == status,
+                    onSelected: (final selected) {
+                      final bloc = context.read<CharacterBloc>();
+                      bloc.add(
+                        GetCharactersEvent(
+                          name: bloc.state.currentNameFilter,
+                          status: selected ? status : null,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
     );
   }
 }
