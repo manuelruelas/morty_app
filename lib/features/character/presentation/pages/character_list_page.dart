@@ -137,9 +137,12 @@ class _CharacterListPageState extends State<CharacterListPage> {
                         ),
                         controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        itemCount: state.hasReachedMax
-                            ? state.characters.length
-                            : state.characters.length + 1,
+                        itemCount:
+                            (state.status == CharacterStatusState.loadingMore ||
+                                (!state.hasReachedMax &&
+                                    state.characters.isNotEmpty))
+                            ? state.characters.length + 1
+                            : state.characters.length,
                         itemBuilder: (final context, final index) {
                           if (index >= state.characters.length) {
                             return const Padding(
