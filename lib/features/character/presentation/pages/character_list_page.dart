@@ -138,9 +138,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
                         controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         itemCount:
-                            (state.status == CharacterStatusState.loadingMore ||
-                                (!state.hasReachedMax &&
-                                    state.characters.isNotEmpty))
+                            state.status == CharacterStatusState.loadingMore
                             ? state.characters.length + 1
                             : state.characters.length,
                         itemBuilder: (final context, final index) {
@@ -197,7 +195,6 @@ class FilterChipsHeader extends StatelessWidget {
                 label: const Text('Todos'),
                 selected: state == null,
                 onSelected: (final selected) {
-                  if (state == null) return;
                   final bloc = context.read<CharacterBloc>();
                   bloc.add(
                     GetCharactersEvent(
