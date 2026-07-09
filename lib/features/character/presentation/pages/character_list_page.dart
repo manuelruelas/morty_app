@@ -35,6 +35,11 @@ class _CharacterListPageState extends State<CharacterListPage> {
 
   void _onScroll() {
     if (_isBottom) {
+      final state = _characterBloc.state;
+      if (state.status == CharacterStatusState.loadingMore ||
+          state.status == CharacterStatusState.loading) {
+        return;
+      }
       _characterBloc.add(LoadNextPageEvent());
     }
   }
@@ -160,6 +165,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
                         ),
                       );
                     case CharacterStatusState.success:
+                    case CharacterStatusState.loadingMore:
                       if (state.characters.isEmpty) {
                         return const Center(
                           child: Text('No se encontraron personajes.'),
@@ -167,6 +173,9 @@ class _CharacterListPageState extends State<CharacterListPage> {
                       }
 
                       return ListView.builder(
+                        key: const PageStorageKey<String>(
+                          'character-list-scroll',
+                        ),
                         controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         itemCount: state.hasReachedMax

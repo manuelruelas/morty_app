@@ -1,7 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
 
-enum CharacterStatusState { initial, loading, success, empty, error }
+enum CharacterStatusState {
+  initial,
+  loading,
+  loadingMore,
+  success,
+  empty,
+  error,
+}
 
 class CharacterState extends Equatable {
   final CharacterStatusState status;

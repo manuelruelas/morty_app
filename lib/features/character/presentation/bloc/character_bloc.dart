@@ -74,9 +74,7 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
     if (state.hasReachedMax || state.status == CharacterStatusState.loading) {
       return;
     }
-
-    emit(state.copyWith(status: CharacterStatusState.loading));
-
+    emit(state.copyWith(status: CharacterStatusState.loadingMore));
     final nextPage = state.currentPage + 1;
 
     final result = await _getCharacters(
@@ -86,22 +84,24 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
     );
 
     result.fold(
-      (final failure) => emit(
-        state.copyWith(
-          status: CharacterStatusState.error,
-          errorMessage: failure.message,
-        ),
-      ),
+      (final failure) =>
+          emit(state.copyWith(status: CharacterStatusState.success)),
       (final characters) {
         if (characters.isEmpty) {
-          emit(state.copyWith(hasReachedMax: true));
-        } else {
           emit(
             state.copyWith(
               status: CharacterStatusState.success,
+              hasReachedMax: true,
+            ),
+          );
+        } else {
+          emit(
+            state.copyWith(
+              status: CharacterStatusState
+                  .success, // Volvemos a success con los nuevos datos
               characters: List.of(state.characters)..addAll(characters),
               currentPage: nextPage,
-              hasReachedMax: false,
+              hasReachedMax: characters.length < 20,
             ),
           );
         }
