@@ -19,3 +19,16 @@ class GetCharactersEvent extends CharacterEvent {
 }
 
 class LoadNextPageEvent extends CharacterEvent {}
+
+class LoadFavoriteCharactersEvent extends CharacterEvent {
+  const LoadFavoriteCharactersEvent();
+}
+
+class ToggleFavoriteCharacterEvent extends CharacterEvent {
+  final Character character;
+
+  const ToggleFavoriteCharacterEvent({required this.character});
+
+  @override
+  List<Object?> get props => [character];
+}

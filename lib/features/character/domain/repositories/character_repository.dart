@@ -10,4 +10,10 @@ abstract class CharacterRepository {
   });
 
   Future<Either<Failure, Character>> getCharacterById({required final int id});
+
+  Future<Either<Failure, List<Character>>> getFavoriteCharacters();
+
+  Future<Either<Failure, bool>> toggleFavoriteCharacter(
+    final Character character,
+  );
 }

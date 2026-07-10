@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:morty_app/features/character/domain/usecases/get_characters.dart';
+import 'package:morty_app/features/character/domain/usecases/get_favorite_characters.dart';
+import 'package:morty_app/features/character/domain/usecases/toggle_favorite_character.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import 'character_event.dart';
@@ -14,13 +16,21 @@ EventTransformer<E> restartableDebounce<E>(final Duration duration) {
 @injectable
 class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
   final GetCharacters _getCharacters;
+  final GetFavoriteCharacters _getFavoriteCharacters;
+  final ToggleFavoriteCharacter _toggleFavoriteCharacter;
 
-  CharacterBloc(this._getCharacters) : super(const CharacterState()) {
+  CharacterBloc(
+    this._getCharacters,
+    this._getFavoriteCharacters,
+    this._toggleFavoriteCharacter,
+  ) : super(const CharacterState()) {
     on<GetCharactersEvent>(
       _onGetCharactersEvent,
       transformer: restartableDebounce(const Duration(milliseconds: 500)),
     );
     on<LoadNextPageEvent>(_onLoadNextPageEvent);
+    on<LoadFavoriteCharactersEvent>(_onLoadFavoriteCharactersEvent);
+    on<ToggleFavoriteCharacterEvent>(_onToggleFavoriteCharacterEvent);
   }
 
   Future<void> _onGetCharactersEvent(
@@ -106,6 +116,71 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
             ),
           );
         }
+      },
+    );
+  }
+
+  Future<void> _onLoadFavoriteCharactersEvent(
+    final LoadFavoriteCharactersEvent event,
+    final Emitter<CharacterState> emit,
+  ) async {
+    final result = await _getFavoriteCharacters();
+
+    result.fold(
+      (final failure) {},
+      (final favoriteCharacters) {
+        emit(
+          state.copyWith(
+            favoriteCharacters: favoriteCharacters,
+            favoriteCharacterIds: favoriteCharacters
+                .map((final character) => character.id)
+                .toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onToggleFavoriteCharacterEvent(
+    final ToggleFavoriteCharacterEvent event,
+    final Emitter<CharacterState> emit,
+  ) async {
+    final result = await _toggleFavoriteCharacter(event.character);
+
+    result.fold(
+      (final failure) {},
+      (final isFavoriteNow) {
+        final nextFavoriteIds = List<int>.of(state.favoriteCharacterIds);
+        final nextFavoriteCharacters = List.of(state.favoriteCharacters);
+
+        if (isFavoriteNow) {
+          if (!nextFavoriteIds.contains(event.character.id)) {
+            nextFavoriteIds.add(event.character.id);
+          }
+          if (!nextFavoriteCharacters.any(
+            (final character) => character.id == event.character.id,
+          )) {
+            nextFavoriteCharacters.add(event.character);
+          }
+        } else {
+          nextFavoriteIds.remove(event.character.id);
+          nextFavoriteCharacters.removeWhere(
+            (final character) => character.id == event.character.id,
+          );
+        }
+
+        nextFavoriteCharacters.sort(
+          (final a, final b) => a.name.toLowerCase().compareTo(
+            b.name.toLowerCase(),
+          ),
+        );
+
+        emit(
+          state.copyWith(
+            favoriteCharacterIds: nextFavoriteIds,
+            favoriteCharacters: nextFavoriteCharacters,
+          ),
+        );
       },
     );
   }

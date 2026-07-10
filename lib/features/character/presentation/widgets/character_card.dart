@@ -5,7 +5,16 @@ import 'package:morty_app/features/character/domain/entities/character.dart';
 class CharacterCard extends StatelessWidget {
   final Character character;
   final VoidCallback? onTap;
-  const CharacterCard({super.key, required this.character, this.onTap});
+  final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
+
+  const CharacterCard({
+    super.key,
+    required this.character,
+    this.onTap,
+    this.isFavorite = false,
+    this.onFavoriteTap,
+  });
 
   @override
   Widget build(final BuildContext context) {
@@ -73,6 +82,21 @@ class CharacterCard extends StatelessWidget {
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        visualDensity: VisualDensity.compact,
+                        tooltip: isFavorite
+                            ? 'Quitar de favoritos'
+                            : 'Agregar a favoritos',
+                        onPressed: onFavoriteTap,
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : null,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Row(
