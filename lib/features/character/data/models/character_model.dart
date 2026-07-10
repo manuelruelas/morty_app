@@ -57,9 +57,24 @@ extension CharacterModelX on CharacterModel {
       imageUrl: image,
       originName: origin.name,
       locationName: location.name,
+      originLocationId: _parseLocationId(origin.url),
+      currentLocationId: _parseLocationId(location.url),
       episodeCount: episode.length,
       episodeIds: _parseEpisodeIds(episode),
     );
+  }
+
+  int? _parseLocationId(final String locationUrl) {
+    if (locationUrl.trim().isEmpty) {
+      return null;
+    }
+
+    final segments = Uri.parse(locationUrl).pathSegments;
+    if (segments.isEmpty) {
+      return null;
+    }
+
+    return int.tryParse(segments.last);
   }
 
   List<int> _parseEpisodeIds(final List<String> episodeUrls) {

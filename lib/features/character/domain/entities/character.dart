@@ -27,6 +27,8 @@ class Character extends Equatable {
   final String imageUrl;
   final String originName;
   final String locationName;
+  final int? originLocationId;
+  final int? currentLocationId;
   final int episodeCount;
   final List<int> episodeIds;
 
@@ -40,6 +42,8 @@ class Character extends Equatable {
     required this.imageUrl,
     required this.originName,
     required this.locationName,
+    this.originLocationId,
+    this.currentLocationId,
     required this.episodeCount,
     required this.episodeIds,
   });
@@ -63,6 +67,8 @@ class Character extends Equatable {
     imageUrl,
     originName,
     locationName,
+    originLocationId,
+    currentLocationId,
     episodeCount,
     episodeIds,
   ];

@@ -6,6 +6,7 @@ import 'package:morty_app/features/episode/domain/entities/episode.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_cubit.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_state.dart';
 import 'package:morty_app/features/episode/presentation/pages/episode_detail_page.dart';
+import 'package:morty_app/features/location/presentation/pages/location_list_page.dart';
 
 class CharacterDetailPage extends StatelessWidget {
   final Character character;
@@ -148,12 +149,36 @@ class CharacterDetailPage extends StatelessWidget {
                     icon: Icons.explore,
                     title: 'Origen',
                     value: character.originName,
+                    onTap: character.originLocationId == null
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (final context) => LocationListPage(
+                                  initialName: character.originName,
+                                ),
+                              ),
+                            );
+                          },
                   ),
                   _buildInfoCard(
                     context,
                     icon: Icons.location_on,
                     title: 'Ubicacion actual',
                     value: character.locationName,
+                    onTap: character.currentLocationId == null
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (final context) => LocationListPage(
+                                  initialName: character.locationName,
+                                ),
+                              ),
+                            );
+                          },
                   ),
                   _buildInfoCard(
                     context,
@@ -187,6 +212,7 @@ Widget _buildInfoCard(
   required final IconData icon,
   required final String title,
   required final String value,
+  final VoidCallback? onTap,
 }) {
   final theme = Theme.of(context);
   return Card(
@@ -199,36 +225,45 @@ Widget _buildInfoCard(
       ),
     ),
     color: theme.colorScheme.surfaceContainerLow,
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: theme.colorScheme.primaryContainer,
-            child: Icon(icon, color: theme.colorScheme.onPrimaryContainer),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: theme.colorScheme.primaryContainer,
+              child: Icon(icon, color: theme.colorScheme.onPrimaryContainer),
             ),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (onTap != null)
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+          ],
+        ),
       ),
     ),
   );
