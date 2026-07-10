@@ -61,7 +61,10 @@ class CharacterLocalDataSourceImpl implements CharacterLocalDataSource {
   @override
   Future<List<Character>> getFavoriteCharacters() async {
     final db = await _db;
-    final rows = await db.query(_favoritesTable, orderBy: 'name COLLATE NOCASE');
+    final rows = await db.query(
+      _favoritesTable,
+      orderBy: 'name COLLATE NOCASE',
+    );
 
     return rows.map(_mapRowToCharacter).toList();
   }

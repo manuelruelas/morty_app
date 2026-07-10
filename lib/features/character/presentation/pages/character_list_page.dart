@@ -146,10 +146,13 @@ class _CharacterListPageState extends State<CharacterListPage> {
                     }
 
                     return ListView.builder(
-                      key: const PageStorageKey<String>('character-list-scroll'),
+                      key: const PageStorageKey<String>(
+                        'character-list-scroll',
+                      ),
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      itemCount: state.status == CharacterStatusState.loadingMore
+                      itemCount:
+                          state.status == CharacterStatusState.loadingMore
                           ? state.characters.length + 1
                           : state.characters.length,
                       itemBuilder: (final context, final index) {

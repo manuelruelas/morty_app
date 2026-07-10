@@ -23,7 +23,9 @@ class FavoriteCharactersPage extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<CharacterBloc>().add(const LoadFavoriteCharactersEvent());
+              context.read<CharacterBloc>().add(
+                const LoadFavoriteCharactersEvent(),
+              );
             },
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),

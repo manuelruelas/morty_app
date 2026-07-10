@@ -126,19 +126,16 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
   ) async {
     final result = await _getFavoriteCharacters();
 
-    result.fold(
-      (final failure) {},
-      (final favoriteCharacters) {
-        emit(
-          state.copyWith(
-            favoriteCharacters: favoriteCharacters,
-            favoriteCharacterIds: favoriteCharacters
-                .map((final character) => character.id)
-                .toList(),
-          ),
-        );
-      },
-    );
+    result.fold((final failure) {}, (final favoriteCharacters) {
+      emit(
+        state.copyWith(
+          favoriteCharacters: favoriteCharacters,
+          favoriteCharacterIds: favoriteCharacters
+              .map((final character) => character.id)
+              .toList(),
+        ),
+      );
+    });
   }
 
   Future<void> _onToggleFavoriteCharacterEvent(
@@ -147,41 +144,37 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
   ) async {
     final result = await _toggleFavoriteCharacter(event.character);
 
-    result.fold(
-      (final failure) {},
-      (final isFavoriteNow) {
-        final nextFavoriteIds = List<int>.of(state.favoriteCharacterIds);
-        final nextFavoriteCharacters = List.of(state.favoriteCharacters);
+    result.fold((final failure) {}, (final isFavoriteNow) {
+      final nextFavoriteIds = List<int>.of(state.favoriteCharacterIds);
+      final nextFavoriteCharacters = List.of(state.favoriteCharacters);
 
-        if (isFavoriteNow) {
-          if (!nextFavoriteIds.contains(event.character.id)) {
-            nextFavoriteIds.add(event.character.id);
-          }
-          if (!nextFavoriteCharacters.any(
-            (final character) => character.id == event.character.id,
-          )) {
-            nextFavoriteCharacters.add(event.character);
-          }
-        } else {
-          nextFavoriteIds.remove(event.character.id);
-          nextFavoriteCharacters.removeWhere(
-            (final character) => character.id == event.character.id,
-          );
+      if (isFavoriteNow) {
+        if (!nextFavoriteIds.contains(event.character.id)) {
+          nextFavoriteIds.add(event.character.id);
         }
-
-        nextFavoriteCharacters.sort(
-          (final a, final b) => a.name.toLowerCase().compareTo(
-            b.name.toLowerCase(),
-          ),
+        if (!nextFavoriteCharacters.any(
+          (final character) => character.id == event.character.id,
+        )) {
+          nextFavoriteCharacters.add(event.character);
+        }
+      } else {
+        nextFavoriteIds.remove(event.character.id);
+        nextFavoriteCharacters.removeWhere(
+          (final character) => character.id == event.character.id,
         );
+      }
 
-        emit(
-          state.copyWith(
-            favoriteCharacterIds: nextFavoriteIds,
-            favoriteCharacters: nextFavoriteCharacters,
-          ),
-        );
-      },
-    );
+      nextFavoriteCharacters.sort(
+        (final a, final b) =>
+            a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
+
+      emit(
+        state.copyWith(
+          favoriteCharacterIds: nextFavoriteIds,
+          favoriteCharacters: nextFavoriteCharacters,
+        ),
+      );
+    });
   }
 }

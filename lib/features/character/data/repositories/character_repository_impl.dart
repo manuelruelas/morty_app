@@ -59,7 +59,9 @@ class CharacterRepositoryImpl implements CharacterRepository {
     final Character character,
   ) async {
     try {
-      final isFavorite = await _localDataSource.isFavoriteCharacter(character.id);
+      final isFavorite = await _localDataSource.isFavoriteCharacter(
+        character.id,
+      );
 
       if (isFavorite) {
         await _localDataSource.removeFavoriteCharacter(character.id);
