@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
+import 'package:morty_app/features/character/presentation/bloc/character_bloc.dart';
+import 'package:morty_app/features/character/presentation/bloc/character_event.dart';
+import 'package:morty_app/features/character/presentation/bloc/character_state.dart';
 import 'package:morty_app/features/episode/domain/entities/episode.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_cubit.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_state.dart';
@@ -33,6 +36,42 @@ class CharacterDetailPage extends StatelessWidget {
             SliverAppBar(
               expandedHeight: 350,
               pinned: true,
+              automaticallyImplyLeading: false,
+              leading: IconButton(
+                tooltip: 'Volver',
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  final navigator = Navigator.of(context);
+
+                  if (navigator.canPop()) {
+                    navigator.pop();
+                    return;
+                  }
+
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+              ),
+              actions: [
+                BlocBuilder<CharacterBloc, CharacterState>(
+                  builder: (final context, final state) {
+                    final isFavorite = state.isFavorite(character.id);
+                    return IconButton(
+                      tooltip: isFavorite
+                          ? 'Quitar de favoritos'
+                          : 'Agregar a favoritos',
+                      onPressed: () {
+                        context.read<CharacterBloc>().add(
+                          ToggleFavoriteCharacterEvent(character: character),
+                        );
+                      },
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.redAccent : Colors.white,
+                      ),
+                    );
+                  },
+                ),
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   character.name,

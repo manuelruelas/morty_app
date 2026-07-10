@@ -18,6 +18,8 @@ class CharacterState extends Equatable {
   final bool hasReachedMax;
   final String currentNameFilter;
   final CharacterStatus? currentStatusFilter;
+  final List<Character> favoriteCharacters;
+  final List<int> favoriteCharacterIds;
 
   const CharacterState({
     this.status = CharacterStatusState.initial,
@@ -27,6 +29,8 @@ class CharacterState extends Equatable {
     this.hasReachedMax = false,
     this.currentNameFilter = '',
     this.currentStatusFilter,
+    this.favoriteCharacters = const [],
+    this.favoriteCharacterIds = const [],
   });
 
   CharacterState copyWith({
@@ -37,6 +41,8 @@ class CharacterState extends Equatable {
     final bool? hasReachedMax,
     final String? currentNameFilter,
     final CharacterStatus? Function()? currentStatusFilter,
+    final List<Character>? favoriteCharacters,
+    final List<int>? favoriteCharacterIds,
   }) {
     return CharacterState(
       status: status ?? this.status,
@@ -48,7 +54,13 @@ class CharacterState extends Equatable {
       currentStatusFilter: currentStatusFilter != null
           ? currentStatusFilter()
           : this.currentStatusFilter,
+      favoriteCharacters: favoriteCharacters ?? this.favoriteCharacters,
+      favoriteCharacterIds: favoriteCharacterIds ?? this.favoriteCharacterIds,
     );
+  }
+
+  bool isFavorite(final int characterId) {
+    return favoriteCharacterIds.contains(characterId);
   }
 
   @override
@@ -60,5 +72,7 @@ class CharacterState extends Equatable {
     hasReachedMax,
     currentNameFilter,
     currentStatusFilter,
+    favoriteCharacters,
+    favoriteCharacterIds,
   ];
 }
