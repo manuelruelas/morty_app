@@ -5,6 +5,7 @@ import 'package:morty_app/core/theme/theme_cubit.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
 import 'package:morty_app/features/character/presentation/pages/character_detail_page.dart';
 import 'package:morty_app/features/character/presentation/widgets/character_card.dart';
+import 'package:morty_app/features/location/presentation/pages/location_list_page.dart';
 
 import '../bloc/character_bloc.dart';
 import '../bloc/character_event.dart';
@@ -60,6 +61,17 @@ class _CharacterListPageState extends State<CharacterListPage> {
         appBar: AppBar(
           title: const Text('Personajes R&M'),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.public),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (final context) => const LocationListPage(),
+                  ),
+                );
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.brightness_6),
               onPressed: () => context.read<ThemeCubit>().toggleTheme(context),
