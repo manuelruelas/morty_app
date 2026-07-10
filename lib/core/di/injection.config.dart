@@ -66,7 +66,9 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     gh.factory<_i611.ThemeCubit>(() => _i611.ThemeCubit());
-    gh.lazySingleton<_i982.LocalDatabaseService>(() => _i982.LocalDatabaseService());
+    gh.lazySingleton<_i982.LocalDatabaseService>(
+      () => _i982.LocalDatabaseService(),
+    );
     gh.lazySingleton<_i361.Dio>(() => registerModule.dio);
     gh.lazySingleton<_i557.ApiClient>(() => registerModule.apiClient);
     gh.lazySingleton<_i838.CharacterRemoteDataSource>(
@@ -79,7 +81,8 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i231.EpisodeRemoteDataSourceImpl(gh<_i557.ApiClient>()),
     );
     gh.lazySingleton<_i724.CharacterLocalDataSource>(
-      () => _i724.CharacterLocalDataSourceImpl(gh<_i982.LocalDatabaseService>()),
+      () =>
+          _i724.CharacterLocalDataSourceImpl(gh<_i982.LocalDatabaseService>()),
     );
     gh.lazySingleton<_i332.LocationRepository>(
       () => _i115.LocationRepositoryImpl(gh<_i1073.LocationRemoteDataSource>()),

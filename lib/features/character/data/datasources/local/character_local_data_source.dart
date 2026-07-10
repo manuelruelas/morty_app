@@ -28,9 +28,10 @@ class CharacterLocalDataSourceImpl implements CharacterLocalDataSource {
       orderBy: 'name COLLATE NOCASE',
     );
     return rows
-        .map((final row) => FavoriteCharacterModel.fromMap(
-                Map<String, dynamic>.from(row),
-              ))
+        .map(
+          (final row) =>
+              FavoriteCharacterModel.fromMap(Map<String, dynamic>.from(row)),
+        )
         .map((final model) => model.toEntity())
         .toList();
   }
