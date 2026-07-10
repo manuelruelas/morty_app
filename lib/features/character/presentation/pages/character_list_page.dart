@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
 import 'package:morty_app/core/theme/theme_cubit.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
+import 'package:morty_app/features/character/presentation/pages/character_detail_page.dart';
 import 'package:morty_app/features/character/presentation/widgets/character_card.dart';
 
 import '../bloc/character_bloc.dart';
@@ -159,7 +160,15 @@ class _CharacterListPageState extends State<CharacterListPage> {
                             child: CharacterCard(
                               character: character,
                               onTap: () {
-                                // TODO: Navegar a Pantalla Detalle
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (final context) =>
+                                        CharacterDetailPage(
+                                          character: character,
+                                        ),
+                                  ),
+                                );
                               },
                             ),
                           );
