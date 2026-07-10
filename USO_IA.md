@@ -4,4 +4,6 @@ Utilice copilot para aprovechar el autocompletado sobre todo al inicio del desar
 
 ##Funcionalidades
 
-- Navegacion por episodios
+- Navegacion por episodios.
+- Navegacion por locacion.
+
