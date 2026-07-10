@@ -22,6 +22,19 @@ import '../../features/character/domain/repositories/character_repository.dart'
 import '../../features/character/domain/usecases/get_characters.dart' as _i568;
 import '../../features/character/presentation/bloc/character_bloc.dart'
     as _i303;
+import '../../features/episode/data/datasources/remote/episode_remote_data_source.dart'
+    as _i231;
+import '../../features/episode/data/repositories/episode_repository_impl.dart'
+    as _i388;
+import '../../features/episode/domain/repositories/episode_repository.dart'
+    as _i992;
+import '../../features/episode/domain/usecases/get_episode_characters_by_ids.dart'
+    as _i119;
+import '../../features/episode/domain/usecases/get_episodes_by_ids.dart'
+    as _i506;
+import '../../features/episode/presentation/cubit/episode_characters_cubit.dart'
+    as _i327;
+import '../../features/episode/presentation/cubit/episode_cubit.dart' as _i523;
 import '../network/api_client.dart' as _i557;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -40,12 +53,30 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i838.CharacterRemoteDataSource>(
       () => _i838.CharacterRemoteDataSourceImpl(gh<_i557.ApiClient>()),
     );
+    gh.lazySingleton<_i231.EpisodeRemoteDataSource>(
+      () => _i231.EpisodeRemoteDataSourceImpl(gh<_i557.ApiClient>()),
+    );
+    gh.lazySingleton<_i992.EpisodeRepository>(
+      () => _i388.EpisodeRepositoryImpl(gh<_i231.EpisodeRemoteDataSource>()),
+    );
     gh.lazySingleton<_i842.CharacterRepository>(
       () =>
           _i428.CharacterRepositoryImpl(gh<_i838.CharacterRemoteDataSource>()),
     );
+    gh.lazySingleton<_i119.GetEpisodeCharactersByIds>(
+      () => _i119.GetEpisodeCharactersByIds(gh<_i992.EpisodeRepository>()),
+    );
+    gh.lazySingleton<_i506.GetEpisodesByIds>(
+      () => _i506.GetEpisodesByIds(gh<_i992.EpisodeRepository>()),
+    );
+    gh.factory<_i523.EpisodeCubit>(
+      () => _i523.EpisodeCubit(gh<_i506.GetEpisodesByIds>()),
+    );
     gh.lazySingleton<_i568.GetCharacters>(
       () => _i568.GetCharacters(gh<_i842.CharacterRepository>()),
+    );
+    gh.factory<_i327.EpisodeCharactersCubit>(
+      () => _i327.EpisodeCharactersCubit(gh<_i119.GetEpisodeCharactersByIds>()),
     );
     gh.factory<_i303.CharacterBloc>(
       () => _i303.CharacterBloc(gh<_i568.GetCharacters>()),

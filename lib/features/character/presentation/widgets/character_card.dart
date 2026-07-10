@@ -39,7 +39,7 @@ class CharacterCard extends StatelessWidget {
                 height: 120,
                 width: 120,
                 fit: BoxFit.cover,
-                placeholder: (final _, final __) => Container(
+                placeholder: (final context, final url) => Container(
                   width: 120,
                   height: 120,
                   color: theme.colorScheme.surfaceContainerHighest,
@@ -47,11 +47,12 @@ class CharacterCard extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 ),
-                errorWidget: (final _, final __, final ___) => const SizedBox(
-                  width: 120,
-                  height: 120,
-                  child: Icon(Icons.broken_image),
-                ),
+                errorWidget: (final context, final url, final error) =>
+                    const SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: Icon(Icons.broken_image),
+                    ),
               ),
             ),
             const SizedBox(width: 16),

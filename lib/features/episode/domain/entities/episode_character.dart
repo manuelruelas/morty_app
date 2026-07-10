@@ -1,23 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:morty_app/features/character/domain/entities/character.dart';
 
-enum CharacterStatus {
-  alive,
-  dead,
-  unknown;
-
-  String get displayName {
-    switch (this) {
-      case CharacterStatus.alive:
-        return 'Alive';
-      case CharacterStatus.dead:
-        return 'Dead';
-      case CharacterStatus.unknown:
-        return 'Unknown';
-    }
-  }
-}
-
-class Character extends Equatable {
+class EpisodeCharacter extends Equatable {
   final int id;
   final String name;
   final CharacterStatus status;
@@ -27,10 +11,9 @@ class Character extends Equatable {
   final String imageUrl;
   final String originName;
   final String locationName;
-  final int episodeCount;
   final List<int> episodeIds;
 
-  const Character({
+  const EpisodeCharacter({
     required this.id,
     required this.name,
     required this.status,
@@ -40,16 +23,23 @@ class Character extends Equatable {
     required this.imageUrl,
     required this.originName,
     required this.locationName,
-    required this.episodeCount,
     required this.episodeIds,
   });
 
-  List<int> get safeEpisodeIds {
-    try {
-      return episodeIds;
-    } catch (_) {
-      return const [];
-    }
+  Character toCharacter() {
+    return Character(
+      id: id,
+      name: name,
+      status: status,
+      species: species,
+      type: type,
+      gender: gender,
+      imageUrl: imageUrl,
+      originName: originName,
+      locationName: locationName,
+      episodeCount: episodeIds.length,
+      episodeIds: episodeIds,
+    );
   }
 
   @override
@@ -63,7 +53,6 @@ class Character extends Equatable {
     imageUrl,
     originName,
     locationName,
-    episodeCount,
     episodeIds,
   ];
 }

@@ -58,7 +58,21 @@ extension CharacterModelX on CharacterModel {
       originName: origin.name,
       locationName: location.name,
       episodeCount: episode.length,
+      episodeIds: _parseEpisodeIds(episode),
     );
+  }
+
+  List<int> _parseEpisodeIds(final List<String> episodeUrls) {
+    return episodeUrls
+        .map((final url) {
+          final segments = Uri.parse(url).pathSegments;
+          if (segments.isEmpty) {
+            return null;
+          }
+          return int.tryParse(segments.last);
+        })
+        .whereType<int>()
+        .toList();
   }
 
   CharacterStatus _parseStatus(final String statusRaw) {
