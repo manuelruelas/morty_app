@@ -141,12 +141,16 @@ class _EpisodeCharacterSquareCard extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Image.network(
-                character.imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (final context, final error, final stackTrace) =>
-                    const Center(child: Icon(Icons.broken_image)),
+              child: Hero(
+                tag: 'character-image-${character.id}',
+                child: Image.network(
+                  character.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder:
+                      (final context, final error, final stackTrace) =>
+                          const Center(child: Icon(Icons.broken_image)),
+                ),
               ),
             ),
             Padding(
