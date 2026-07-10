@@ -4,6 +4,11 @@ import 'package:morty_app/features/episode/domain/entities/episode.dart';
 import 'package:morty_app/features/episode/domain/entities/episode_character.dart';
 
 abstract class EpisodeRepository {
+  Future<Either<Failure, List<Episode>>> getEpisodes({
+    required final int page,
+    final String? name,
+  });
+
   Future<Either<Failure, List<Episode>>> getEpisodesByIds({
     required final List<int> ids,
   });

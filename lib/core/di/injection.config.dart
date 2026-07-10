@@ -30,8 +30,11 @@ import '../../features/episode/domain/repositories/episode_repository.dart'
     as _i992;
 import '../../features/episode/domain/usecases/get_episode_characters_by_ids.dart'
     as _i119;
+import '../../features/episode/domain/usecases/get_episodes.dart' as _i686;
 import '../../features/episode/domain/usecases/get_episodes_by_ids.dart'
     as _i506;
+import '../../features/episode/presentation/bloc/episode_list_bloc.dart'
+    as _i730;
 import '../../features/episode/presentation/cubit/episode_characters_cubit.dart'
     as _i327;
 import '../../features/episode/presentation/cubit/episode_cubit.dart' as _i523;
@@ -80,6 +83,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i119.GetEpisodeCharactersByIds>(
       () => _i119.GetEpisodeCharactersByIds(gh<_i992.EpisodeRepository>()),
     );
+    gh.lazySingleton<_i686.GetEpisodes>(
+      () => _i686.GetEpisodes(gh<_i992.EpisodeRepository>()),
+    );
     gh.lazySingleton<_i506.GetEpisodesByIds>(
       () => _i506.GetEpisodesByIds(gh<_i992.EpisodeRepository>()),
     );
@@ -94,6 +100,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i327.EpisodeCharactersCubit>(
       () => _i327.EpisodeCharactersCubit(gh<_i119.GetEpisodeCharactersByIds>()),
+    );
+    gh.factory<_i730.EpisodeListBloc>(
+      () => _i730.EpisodeListBloc(gh<_i686.GetEpisodes>()),
     );
     gh.factory<_i303.CharacterBloc>(
       () => _i303.CharacterBloc(gh<_i568.GetCharacters>()),

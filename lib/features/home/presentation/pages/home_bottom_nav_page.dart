@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morty_app/features/character/presentation/pages/character_list_page.dart';
+import 'package:morty_app/features/episode/presentation/pages/episode_list_page.dart';
 import 'package:morty_app/features/location/presentation/pages/location_list_page.dart';
 
 class HomeBottomNavPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _HomeBottomNavPageState extends State<HomeBottomNavPage> {
   late final List<Widget> _pages = [
     const CharacterListPage(),
     const LocationListPage(),
-    const _EpisodesPlaceholderPage(),
+    const EpisodeListPage(),
     const _FavoritesPlaceholderPage(),
   ];
 
@@ -53,19 +54,6 @@ class _HomeBottomNavPageState extends State<HomeBottomNavPage> {
             label: 'Favoritos',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _EpisodesPlaceholderPage extends StatelessWidget {
-  const _EpisodesPlaceholderPage();
-
-  @override
-  Widget build(final BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Seccion de episodios: pendiente de implementacion.'),
       ),
     );
   }
