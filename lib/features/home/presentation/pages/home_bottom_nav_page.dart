@@ -22,8 +22,14 @@ class _HomeBottomNavPageState extends State<HomeBottomNavPage> {
 
   @override
   Widget build(final BuildContext context) {
+    final pagesWithHeroMode = List<Widget>.generate(_pages.length, (
+      final index,
+    ) {
+      return HeroMode(enabled: index == _currentIndex, child: _pages[index]);
+    });
+
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: IndexedStack(index: _currentIndex, children: pagesWithHeroMode),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
