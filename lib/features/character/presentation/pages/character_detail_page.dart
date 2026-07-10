@@ -244,7 +244,7 @@ class _EpisodesSection extends StatefulWidget {
 }
 
 class _EpisodesSectionState extends State<_EpisodesSection> {
-  static const int _collapsedCount = 6;
+  static const int _collapsedCount = 3;
   bool _expanded = false;
 
   @override
