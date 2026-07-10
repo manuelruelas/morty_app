@@ -179,11 +179,18 @@ class _CharacterListPageState extends State<CharacterListPage> {
                               );
                             },
                             onTap: () {
+                              final characterBloc =
+                                  context.read<CharacterBloc>();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute<void>(
-                                  builder: (final context) =>
-                                      CharacterDetailPage(character: character),
+                                  builder: (final routeContext) =>
+                                      BlocProvider.value(
+                                        value: characterBloc,
+                                        child: CharacterDetailPage(
+                                          character: character,
+                                        ),
+                                      ),
                                 ),
                               );
                             },

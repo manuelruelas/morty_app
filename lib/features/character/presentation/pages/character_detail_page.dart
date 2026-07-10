@@ -36,6 +36,21 @@ class CharacterDetailPage extends StatelessWidget {
             SliverAppBar(
               expandedHeight: 350,
               pinned: true,
+              automaticallyImplyLeading: false,
+              leading: IconButton(
+                tooltip: 'Volver',
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  final navigator = Navigator.of(context);
+
+                  if (navigator.canPop()) {
+                    navigator.pop();
+                    return;
+                  }
+
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+              ),
               actions: [
                 BlocBuilder<CharacterBloc, CharacterState>(
                   builder: (final context, final state) {
