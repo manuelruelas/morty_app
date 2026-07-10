@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/bloc/app_bloc_observer.dart';
 import 'package:morty_app/core/di/injection.dart';
 import 'package:morty_app/core/theme/theme_cubit.dart';
-import 'package:morty_app/features/character/presentation/pages/character_list_page.dart';
+import 'package:morty_app/features/home/presentation/pages/home_bottom_nav_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +27,7 @@ class MainApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeCubit.lightTheme,
             darkTheme: ThemeCubit.darkTheme,
-            home: const CharacterListPage(),
+            home: const HomeBottomNavPage(),
           );
         },
       ),
