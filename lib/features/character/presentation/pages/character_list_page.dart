@@ -179,8 +179,8 @@ class _CharacterListPageState extends State<CharacterListPage> {
                               );
                             },
                             onTap: () {
-                              final characterBloc =
-                                  context.read<CharacterBloc>();
+                              final characterBloc = context
+                                  .read<CharacterBloc>();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute<void>(

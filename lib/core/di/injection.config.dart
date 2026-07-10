@@ -52,6 +52,7 @@ import '../../features/location/domain/repositories/location_repository.dart'
     as _i332;
 import '../../features/location/domain/usecases/get_locations.dart' as _i332;
 import '../../features/location/presentation/bloc/location_bloc.dart' as _i845;
+import '../database/app_database.dart' as _i982;
 import '../network/api_client.dart' as _i557;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -65,6 +66,7 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     gh.factory<_i611.ThemeCubit>(() => _i611.ThemeCubit());
+    gh.lazySingleton<_i982.LocalDatabaseService>(() => _i982.LocalDatabaseService());
     gh.lazySingleton<_i361.Dio>(() => registerModule.dio);
     gh.lazySingleton<_i557.ApiClient>(() => registerModule.apiClient);
     gh.lazySingleton<_i838.CharacterRemoteDataSource>(
@@ -73,11 +75,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1073.LocationRemoteDataSource>(
       () => _i1073.LocationRemoteDataSourceImpl(gh<_i557.ApiClient>()),
     );
-    gh.lazySingleton<_i724.CharacterLocalDataSource>(
-      () => _i724.CharacterLocalDataSourceImpl(),
-    );
     gh.lazySingleton<_i231.EpisodeRemoteDataSource>(
       () => _i231.EpisodeRemoteDataSourceImpl(gh<_i557.ApiClient>()),
+    );
+    gh.lazySingleton<_i724.CharacterLocalDataSource>(
+      () => _i724.CharacterLocalDataSourceImpl(gh<_i982.LocalDatabaseService>()),
     );
     gh.lazySingleton<_i332.LocationRepository>(
       () => _i115.LocationRepositoryImpl(gh<_i1073.LocationRemoteDataSource>()),
