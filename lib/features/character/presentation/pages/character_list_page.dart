@@ -73,6 +73,193 @@ class _CharacterListPageState extends State<CharacterListPage> {
     );
   }
 
+  void _clearAdvancedFilters() {
+    _speciesController.clear();
+    _typeController.clear();
+    final bloc = context.read<CharacterBloc>();
+    bloc.add(
+      GetCharactersEvent(
+        name: _nameController.text.trim(),
+        status: null,
+        species: null,
+        type: null,
+        gender: null,
+      ),
+    );
+  }
+
+  Future<void> _openAdvancedFilters() async {
+    final bloc = context.read<CharacterBloc>();
+    final speciesController = TextEditingController(
+      text: bloc.state.currentSpeciesFilter,
+    );
+    final typeController = TextEditingController(
+      text: bloc.state.currentTypeFilter,
+    );
+    CharacterStatus? selectedStatus = bloc.state.currentStatusFilter;
+    CharacterGender? selectedGender = bloc.state.currentGenderFilter;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (final sheetContext) {
+        return StatefulBuilder(
+          builder: (final context, final setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Filtros avanzados',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              setModalState(() {
+                                speciesController.clear();
+                                typeController.clear();
+                                selectedStatus = null;
+                                selectedGender = null;
+                              });
+                            },
+                            child: const Text('Limpiar'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: speciesController,
+                        decoration: InputDecoration(
+                          hintText: 'Filtrar por especie...',
+                          prefixIcon: const Icon(Icons.pets),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: typeController,
+                        decoration: InputDecoration(
+                          hintText: 'Filtrar por tipo...',
+                          prefixIcon: const Icon(Icons.category_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Estado',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ChoiceChip(
+                            label: const Text('Todos'),
+                            selected: selectedStatus == null,
+                            onSelected: (final selected) {
+                              setModalState(() {
+                                selectedStatus = null;
+                              });
+                            },
+                          ),
+                          ...CharacterStatus.values.map((final status) {
+                            return ChoiceChip(
+                              label: Text(status.displayName),
+                              selected: selectedStatus == status,
+                              onSelected: (final selected) {
+                                setModalState(() {
+                                  selectedStatus = selected ? status : null;
+                                });
+                              },
+                            );
+                          }),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Género',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ChoiceChip(
+                            label: const Text('Todos'),
+                            selected: selectedGender == null,
+                            onSelected: (final selected) {
+                              setModalState(() {
+                                selectedGender = null;
+                              });
+                            },
+                          ),
+                          ...CharacterGender.values.map((final gender) {
+                            return ChoiceChip(
+                              label: Text(gender.displayName),
+                              selected: selectedGender == gender,
+                              onSelected: (final selected) {
+                                setModalState(() {
+                                  selectedGender = selected ? gender : null;
+                                });
+                              },
+                            );
+                          }),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: () {
+                            _speciesController.text = speciesController.text;
+                            _typeController.text = typeController.text;
+                            bloc.add(
+                              GetCharactersEvent(
+                                name: _nameController.text.trim(),
+                                status: selectedStatus,
+                                species: speciesController.text.trim(),
+                                type: typeController.text.trim(),
+                                gender: selectedGender,
+                              ),
+                            );
+                            Navigator.of(sheetContext).pop();
+                          },
+                          icon: const Icon(Icons.check),
+                          label: const Text('Aplicar filtros'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    speciesController.dispose();
+    typeController.dispose();
+  }
+
   void _onScroll() {
     if (_isBottom) {
       final bloc = context.read<CharacterBloc>();
@@ -122,33 +309,13 @@ class _CharacterListPageState extends State<CharacterListPage> {
                   onChanged: (final value) => _applyFilters(),
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: _speciesController,
-                  decoration: InputDecoration(
-                    hintText: 'Filtrar por especie...',
-                    prefixIcon: const Icon(Icons.pets),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (final value) => _applyFilters(),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _typeController,
-                  decoration: InputDecoration(
-                    hintText: 'Filtrar por tipo...',
-                    prefixIcon: const Icon(Icons.category_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (final value) => _applyFilters(),
+                CharacterFilterBar(
+                  onOpenFilters: _openAdvancedFilters,
+                  onClearFilters: _clearAdvancedFilters,
                 ),
               ],
             ),
           ),
-          const FilterChipsHeader(),
           const SizedBox(height: 12),
           Expanded(
             child: BlocBuilder<CharacterBloc, CharacterState>(
@@ -254,103 +421,68 @@ class _CharacterListPageState extends State<CharacterListPage> {
   }
 }
 
-class FilterChipsHeader extends StatelessWidget {
-  const FilterChipsHeader({super.key});
+class CharacterFilterBar extends StatelessWidget {
+  final VoidCallback onOpenFilters;
+  final VoidCallback onClearFilters;
+
+  const CharacterFilterBar({
+    required this.onOpenFilters,
+    required this.onClearFilters,
+    super.key,
+  });
 
   @override
   Widget build(final BuildContext context) {
     return BlocSelector<CharacterBloc, CharacterState, CharacterState>(
       selector: (final state) => state,
       builder: (final context, final state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+        final activeFilters = _buildActiveFiltersSummary(state);
+        final hasAdvancedFilters =
+            state.currentStatusFilter != null ||
+            state.currentGenderFilter != null ||
+            state.currentSpeciesFilter.isNotEmpty ||
+            state.currentTypeFilter.isNotEmpty;
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Estado', style: Theme.of(context).textTheme.titleSmall),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+              Row(
                 children: [
-                  ChoiceChip(
-                    label: const Text('Todos'),
-                    selected: state.currentStatusFilter == null,
-                    onSelected: (final selected) {
-                      final bloc = context.read<CharacterBloc>();
-                      bloc.add(
-                        GetCharactersEvent(
-                          name: bloc.state.currentNameFilter,
-                          status: null,
-                          species: bloc.state.currentSpeciesFilter,
-                          type: bloc.state.currentTypeFilter,
-                          gender: bloc.state.currentGenderFilter,
-                        ),
-                      );
-                    },
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onOpenFilters,
+                      icon: const Icon(Icons.tune),
+                      label: Text(
+                        hasAdvancedFilters
+                            ? 'Filtros avanzados (${_advancedFilterCount(state)})'
+                            : 'Filtros avanzados',
+                      ),
+                    ),
                   ),
-                  ...CharacterStatus.values.map((final status) {
-                    return ChoiceChip(
-                      label: Text(status.displayName),
-                      selected: state.currentStatusFilter == status,
-                      onSelected: (final selected) {
-                        final bloc = context.read<CharacterBloc>();
-                        bloc.add(
-                          GetCharactersEvent(
-                            name: bloc.state.currentNameFilter,
-                            status: selected ? status : null,
-                            species: bloc.state.currentSpeciesFilter,
-                            type: bloc.state.currentTypeFilter,
-                            gender: bloc.state.currentGenderFilter,
-                          ),
-                        );
-                      },
-                    );
-                  }),
+                  if (hasAdvancedFilters) ...[
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: onClearFilters,
+                      child: const Text('Limpiar'),
+                    ),
+                  ],
                 ],
               ),
-              const SizedBox(height: 12),
-              Text('Género', style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ChoiceChip(
-                    label: const Text('Todos'),
-                    selected: state.currentGenderFilter == null,
-                    onSelected: (final selected) {
-                      final bloc = context.read<CharacterBloc>();
-                      bloc.add(
-                        GetCharactersEvent(
-                          name: bloc.state.currentNameFilter,
-                          status: bloc.state.currentStatusFilter,
-                          species: bloc.state.currentSpeciesFilter,
-                          type: bloc.state.currentTypeFilter,
-                          gender: null,
-                        ),
-                      );
-                    },
-                  ),
-                  ...CharacterGender.values.map((final gender) {
-                    return ChoiceChip(
-                      label: Text(gender.displayName),
-                      selected: state.currentGenderFilter == gender,
-                      onSelected: (final selected) {
-                        final bloc = context.read<CharacterBloc>();
-                        bloc.add(
-                          GetCharactersEvent(
-                            name: bloc.state.currentNameFilter,
-                            status: bloc.state.currentStatusFilter,
-                            species: bloc.state.currentSpeciesFilter,
-                            type: bloc.state.currentTypeFilter,
-                            gender: selected ? gender : null,
-                          ),
-                        );
-                      },
-                    );
-                  }),
-                ],
+              Text(
+                activeFilters,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
@@ -358,4 +490,44 @@ class FilterChipsHeader extends StatelessWidget {
       },
     );
   }
+}
+
+int _advancedFilterCount(final CharacterState state) {
+  var count = 0;
+  if (state.currentStatusFilter != null) {
+    count++;
+  }
+  if (state.currentGenderFilter != null) {
+    count++;
+  }
+  if (state.currentSpeciesFilter.isNotEmpty) {
+    count++;
+  }
+  if (state.currentTypeFilter.isNotEmpty) {
+    count++;
+  }
+  return count;
+}
+
+String _buildActiveFiltersSummary(final CharacterState state) {
+  final filters = <String>[];
+
+  if (state.currentStatusFilter != null) {
+    filters.add('Estado: ${state.currentStatusFilter!.displayName}');
+  }
+  if (state.currentGenderFilter != null) {
+    filters.add('Género: ${state.currentGenderFilter!.displayName}');
+  }
+  if (state.currentSpeciesFilter.isNotEmpty) {
+    filters.add('Especie: ${state.currentSpeciesFilter}');
+  }
+  if (state.currentTypeFilter.isNotEmpty) {
+    filters.add('Tipo: ${state.currentTypeFilter}');
+  }
+
+  if (filters.isEmpty) {
+    return 'Sin filtros avanzados aplicados';
+  }
+
+  return filters.join('  •  ');
 }
