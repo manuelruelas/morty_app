@@ -67,6 +67,9 @@ void main() {
           page: 1,
           name: 'rick',
           status: 'alive',
+          species: 'Human',
+          type: 'Scientist',
+          gender: 'male',
         ),
       ).thenAnswer((_) async => [tCharacterModel]);
 
@@ -74,6 +77,9 @@ void main() {
         page: 1,
         name: 'rick',
         status: CharacterStatus.alive,
+        species: 'Human',
+        type: 'Scientist',
+        gender: CharacterGender.male,
       );
       result.fold(
         (final failure) {
@@ -91,6 +97,9 @@ void main() {
           page: 1,
           name: 'rick',
           status: 'alive',
+          species: 'Human',
+          type: 'Scientist',
+          gender: 'male',
         ),
       ).called(1);
       verifyNoMoreInteractions(mockRemoteDataSource);
@@ -102,6 +111,9 @@ void main() {
           page: 1,
           name: 'zzz',
           status: null,
+          species: null,
+          type: null,
+          gender: null,
         ),
       ).thenAnswer((_) async => []);
 
@@ -120,6 +132,9 @@ void main() {
           page: 1,
           name: 'zzz',
           status: null,
+          species: null,
+          type: null,
+          gender: null,
         ),
       ).called(1);
     });
@@ -130,6 +145,9 @@ void main() {
           page: 1,
           name: null,
           status: null,
+          species: null,
+          type: null,
+          gender: null,
         ),
       ).thenThrow(Exception('boom'));
 

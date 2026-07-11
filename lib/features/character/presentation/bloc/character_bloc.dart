@@ -37,11 +37,18 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
     final GetCharactersEvent event,
     final Emitter<CharacterState> emit,
   ) async {
+    final normalizedName = _normalizeFilterValue(event.name);
+    final normalizedSpecies = _normalizeFilterValue(event.species);
+    final normalizedType = _normalizeFilterValue(event.type);
+
     emit(
       state.copyWith(
         status: CharacterStatusState.loading,
-        currentNameFilter: event.name ?? '',
+        currentNameFilter: normalizedName ?? '',
         currentStatusFilter: () => event.status,
+        currentSpeciesFilter: normalizedSpecies ?? '',
+        currentTypeFilter: normalizedType ?? '',
+        currentGenderFilter: () => event.gender,
         currentPage: 1,
         hasReachedMax: false,
       ),
@@ -49,8 +56,11 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
 
     final result = await _getCharacters(
       page: 1,
-      name: event.name,
+      name: normalizedName,
       status: event.status,
+      species: normalizedSpecies,
+      type: normalizedType,
+      gender: event.gender,
     );
 
     result.fold(
@@ -70,6 +80,9 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
               characters: characters,
               currentPage: 1,
               currentStatusFilter: () => event.status,
+              currentSpeciesFilter: normalizedSpecies ?? '',
+              currentTypeFilter: normalizedType ?? '',
+              currentGenderFilter: () => event.gender,
               hasReachedMax: false,
             ),
           );
@@ -92,6 +105,11 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
       page: nextPage,
       name: state.currentNameFilter.isNotEmpty ? state.currentNameFilter : null,
       status: state.currentStatusFilter,
+      species: state.currentSpeciesFilter.isNotEmpty
+          ? state.currentSpeciesFilter
+          : null,
+      type: state.currentTypeFilter.isNotEmpty ? state.currentTypeFilter : null,
+      gender: state.currentGenderFilter,
     );
 
     result.fold(
@@ -176,5 +194,13 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
         ),
       );
     });
+  }
+
+  String? _normalizeFilterValue(final String? value) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return null;
+    }
+    return trimmed;
   }
 }

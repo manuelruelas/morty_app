@@ -14,7 +14,17 @@ class GetCharacters {
     required final int page,
     final String? name,
     final CharacterStatus? status,
+    final String? species,
+    final String? type,
+    final CharacterGender? gender,
   }) {
-    return repository.getCharacters(page: page, name: name, status: status);
+    return repository.getCharacters(
+      page: page,
+      name: name,
+      status: status,
+      species: species,
+      type: type,
+      gender: gender,
+    );
   }
 }

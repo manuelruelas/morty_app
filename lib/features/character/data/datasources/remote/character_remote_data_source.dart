@@ -9,6 +9,9 @@ abstract class CharacterRemoteDataSource {
     required final int page,
     final String? name,
     final String? status,
+    final String? species,
+    final String? type,
+    final String? gender,
   });
 }
 
@@ -23,11 +26,17 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
     required final int page,
     final String? name,
     final String? status,
+    final String? species,
+    final String? type,
+    final String? gender,
   }) async {
     try {
       final queryParameters = <String, dynamic>{'page': page};
-      if (name != null) queryParameters['name'] = name;
-      if (status != null) queryParameters['status'] = status;
+      if (_hasValue(name)) queryParameters['name'] = name;
+      if (_hasValue(status)) queryParameters['status'] = status;
+      if (_hasValue(species)) queryParameters['species'] = species;
+      if (_hasValue(type)) queryParameters['type'] = type;
+      if (_hasValue(gender)) queryParameters['gender'] = gender;
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/character',
         queryParameters: queryParameters,
@@ -42,5 +51,9 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
       }
       rethrow;
     }
+  }
+
+  bool _hasValue(final String? value) {
+    return value != null && value.trim().isNotEmpty;
   }
 }

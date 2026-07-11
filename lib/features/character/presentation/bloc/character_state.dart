@@ -18,6 +18,9 @@ class CharacterState extends Equatable {
   final bool hasReachedMax;
   final String currentNameFilter;
   final CharacterStatus? currentStatusFilter;
+  final String currentSpeciesFilter;
+  final String currentTypeFilter;
+  final CharacterGender? currentGenderFilter;
   final List<Character> favoriteCharacters;
   final List<int> favoriteCharacterIds;
 
@@ -29,6 +32,9 @@ class CharacterState extends Equatable {
     this.hasReachedMax = false,
     this.currentNameFilter = '',
     this.currentStatusFilter,
+    this.currentSpeciesFilter = '',
+    this.currentTypeFilter = '',
+    this.currentGenderFilter,
     this.favoriteCharacters = const [],
     this.favoriteCharacterIds = const [],
   });
@@ -41,6 +47,9 @@ class CharacterState extends Equatable {
     final bool? hasReachedMax,
     final String? currentNameFilter,
     final CharacterStatus? Function()? currentStatusFilter,
+    final String? currentSpeciesFilter,
+    final String? currentTypeFilter,
+    final CharacterGender? Function()? currentGenderFilter,
     final List<Character>? favoriteCharacters,
     final List<int>? favoriteCharacterIds,
   }) {
@@ -54,6 +63,11 @@ class CharacterState extends Equatable {
       currentStatusFilter: currentStatusFilter != null
           ? currentStatusFilter()
           : this.currentStatusFilter,
+      currentSpeciesFilter: currentSpeciesFilter ?? this.currentSpeciesFilter,
+      currentTypeFilter: currentTypeFilter ?? this.currentTypeFilter,
+      currentGenderFilter: currentGenderFilter != null
+          ? currentGenderFilter()
+          : this.currentGenderFilter,
       favoriteCharacters: favoriteCharacters ?? this.favoriteCharacters,
       favoriteCharacterIds: favoriteCharacterIds ?? this.favoriteCharacterIds,
     );
@@ -72,6 +86,9 @@ class CharacterState extends Equatable {
     hasReachedMax,
     currentNameFilter,
     currentStatusFilter,
+    currentSpeciesFilter,
+    currentTypeFilter,
+    currentGenderFilter,
     favoriteCharacters,
     favoriteCharacterIds,
   ];

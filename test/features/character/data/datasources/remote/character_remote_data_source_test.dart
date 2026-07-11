@@ -57,7 +57,13 @@ void main() {
       ),
     );
 
-    final result = await dataSource.getCharacters(page: 1, name: 'rick');
+    final result = await dataSource.getCharacters(
+      page: 1,
+      name: 'rick',
+      species: 'Human',
+      type: 'Scientist',
+      gender: 'male',
+    );
 
     expect(result, hasLength(1));
     expect(result.first.name, 'Rick Sanchez');
@@ -65,7 +71,47 @@ void main() {
     verify(
       () => mockDio.get<Map<String, dynamic>>(
         '/character',
-        queryParameters: any(named: 'queryParameters'),
+        queryParameters: {
+          'page': 1,
+          'name': 'rick',
+          'species': 'Human',
+          'type': 'Scientist',
+          'gender': 'male',
+        },
+      ),
+    ).called(1);
+  });
+
+  test('omite filtros vacios en queryParameters', () async {
+    when(
+      () => mockDio.get<Map<String, dynamic>>(
+        '/character',
+        queryParameters: {'page': 1},
+      ),
+    ).thenAnswer(
+      (_) async => Response<Map<String, dynamic>>(
+        requestOptions: RequestOptions(path: '/character'),
+        data: {
+          'info': {'count': 0, 'pages': 0, 'next': null, 'prev': null},
+          'results': <Map<String, dynamic>>[],
+        },
+        statusCode: 200,
+      ),
+    );
+
+    final result = await dataSource.getCharacters(
+      page: 1,
+      name: '',
+      species: ' ',
+      type: '',
+      gender: null,
+    );
+
+    expect(result, isEmpty);
+    verify(
+      () => mockDio.get<Map<String, dynamic>>(
+        '/character',
+        queryParameters: {'page': 1},
       ),
     ).called(1);
   });

@@ -11,11 +11,20 @@ abstract class CharacterEvent extends Equatable {
 class GetCharactersEvent extends CharacterEvent {
   final String? name;
   final CharacterStatus? status;
+  final String? species;
+  final String? type;
+  final CharacterGender? gender;
 
-  const GetCharactersEvent({this.name, this.status});
+  const GetCharactersEvent({
+    this.name,
+    this.status,
+    this.species,
+    this.type,
+    this.gender,
+  });
 
   @override
-  List<Object?> get props => [name, status];
+  List<Object?> get props => [name, status, species, type, gender];
 }
 
 class LoadNextPageEvent extends CharacterEvent {}

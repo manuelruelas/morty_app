@@ -26,13 +26,20 @@ class CharacterRepositoryImpl implements CharacterRepository {
     required final int page,
     final String? name,
     final CharacterStatus? status,
+    final String? species,
+    final String? type,
+    final CharacterGender? gender,
   }) async {
     try {
       final statusString = status?.name;
+      final genderString = gender?.name;
       final characters = await _remoteDataSource.getCharacters(
         page: page,
         name: name,
         status: statusString,
+        species: species,
+        type: type,
+        gender: genderString,
       );
       final entities = characters
           .map((final model) => model.toEntity())
