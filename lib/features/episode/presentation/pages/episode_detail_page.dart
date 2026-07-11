@@ -129,7 +129,7 @@ class _EpisodeCharacterSquareCard extends StatelessWidget {
           context,
           MaterialPageRoute<void>(
             builder: (final context) =>
-                CharacterDetailPage(character: character.toCharacter()),
+                CharacterDetailPage(characterId: character.id),
           ),
         );
       },

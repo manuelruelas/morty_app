@@ -16,9 +16,21 @@ class CharacterRepositoryImpl implements CharacterRepository {
   CharacterRepositoryImpl(this._remoteDataSource, this._localDataSource);
 
   @override
-  Future<Either<Failure, Character>> getCharacterById({required final int id}) {
-    // TODO: implement getCharacterById
-    throw UnimplementedError();
+  Future<Either<Failure, Character>> getCharacterById({
+    required final int id,
+  }) async {
+    try {
+      final characterModel = await _remoteDataSource.getCharacterById(id: id);
+      return Right(characterModel.toEntity());
+    } catch (e) {
+      return Left(
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar el detalle del personaje. Intentalo nuevamente.',
+        ),
+      );
+    }
   }
 
   @override

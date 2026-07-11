@@ -13,6 +13,8 @@ abstract class CharacterRemoteDataSource {
     final String? type,
     final String? gender,
   });
+
+  Future<CharacterModel> getCharacterById({required final int id});
 }
 
 @LazySingleton(as: CharacterRemoteDataSource)
@@ -51,6 +53,15 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
       }
       rethrow;
     }
+  }
+
+  @override
+  Future<CharacterModel> getCharacterById({required final int id}) async {
+    final response = await _apiClient.dio.get<Map<String, dynamic>>(
+      '/character/$id',
+    );
+
+    return CharacterModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   bool _hasValue(final String? value) {
