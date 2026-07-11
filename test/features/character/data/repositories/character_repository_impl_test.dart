@@ -60,6 +60,46 @@ void main() {
       mockLocalDataSource,
     );
   });
+
+  group('getCharacterById', () {
+    test('retorna Right(Character) cuando remote responde OK', () async {
+      when(
+        () => mockRemoteDataSource.getCharacterById(id: 1),
+      ).thenAnswer((_) async => tCharacterModel);
+
+      final result = await repository.getCharacterById(id: 1);
+
+      result.fold(
+        (final failure) {
+          fail('Se esperaba Right(Character), pero se obtuvo Left($failure)');
+        },
+        (final character) {
+          expect(character, tCharacter);
+        },
+      );
+
+      verify(() => mockRemoteDataSource.getCharacterById(id: 1)).called(1);
+      verifyNoMoreInteractions(mockRemoteDataSource);
+    });
+
+    test('retorna Left(ServerFailure) cuando remote lanza excepcion', () async {
+      when(
+        () => mockRemoteDataSource.getCharacterById(id: 1),
+      ).thenThrow(Exception('boom'));
+
+      final result = await repository.getCharacterById(id: 1);
+
+      expect(result.isLeft(), true);
+      result.fold((final failure) {
+        expect(failure, isA<ServerFailure>());
+        expect(
+          failure.message,
+          'No pudimos cargar el detalle del personaje. Intentalo nuevamente.',
+        );
+      }, (_) => fail('Se esperaba Left(ServerFailure)'));
+    });
+  });
+
   group('getCharacters', () {
     test('retorna Right(List<Character>) cuando remote responde OK', () async {
       when(

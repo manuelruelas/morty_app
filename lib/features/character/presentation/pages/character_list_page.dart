@@ -405,7 +405,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
                                       BlocProvider.value(
                                         value: characterBloc,
                                         child: CharacterDetailPage(
-                                          character: character,
+                                          characterId: character.id,
                                         ),
                                       ),
                                 ),

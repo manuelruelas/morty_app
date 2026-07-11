@@ -1,5 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format width=80
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -21,6 +21,8 @@ import '../../features/character/data/repositories/character_repository_impl.dar
     as _i428;
 import '../../features/character/domain/repositories/character_repository.dart'
     as _i842;
+import '../../features/character/domain/usecases/get_character_by_id.dart'
+    as _i872;
 import '../../features/character/domain/usecases/get_characters.dart' as _i568;
 import '../../features/character/domain/usecases/get_favorite_characters.dart'
     as _i266;
@@ -28,6 +30,8 @@ import '../../features/character/domain/usecases/toggle_favorite_character.dart'
     as _i757;
 import '../../features/character/presentation/bloc/character_bloc.dart'
     as _i303;
+import '../../features/character/presentation/cubit/character_detail_cubit.dart'
+    as _i439;
 import '../../features/episode/data/datasources/remote/episode_remote_data_source.dart'
     as _i231;
 import '../../features/episode/data/repositories/episode_repository_impl.dart'
@@ -80,12 +84,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i231.EpisodeRemoteDataSource>(
       () => _i231.EpisodeRemoteDataSourceImpl(gh<_i557.ApiClient>()),
     );
+    gh.lazySingleton<_i332.LocationRepository>(
+      () => _i115.LocationRepositoryImpl(gh<_i1073.LocationRemoteDataSource>()),
+    );
     gh.lazySingleton<_i724.CharacterLocalDataSource>(
       () =>
           _i724.CharacterLocalDataSourceImpl(gh<_i982.LocalDatabaseService>()),
-    );
-    gh.lazySingleton<_i332.LocationRepository>(
-      () => _i115.LocationRepositoryImpl(gh<_i1073.LocationRemoteDataSource>()),
     );
     gh.lazySingleton<_i992.EpisodeRepository>(
       () => _i388.EpisodeRepositoryImpl(gh<_i231.EpisodeRemoteDataSource>()),
@@ -96,17 +100,17 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i724.CharacterLocalDataSource>(),
       ),
     );
-    gh.lazySingleton<_i266.GetFavoriteCharacters>(
-      () => _i266.GetFavoriteCharacters(gh<_i842.CharacterRepository>()),
-    );
     gh.lazySingleton<_i757.ToggleFavoriteCharacter>(
       () => _i757.ToggleFavoriteCharacter(gh<_i842.CharacterRepository>()),
     );
-    gh.lazySingleton<_i119.GetEpisodeCharactersByIds>(
-      () => _i119.GetEpisodeCharactersByIds(gh<_i992.EpisodeRepository>()),
+    gh.lazySingleton<_i266.GetFavoriteCharacters>(
+      () => _i266.GetFavoriteCharacters(gh<_i842.CharacterRepository>()),
     );
     gh.lazySingleton<_i686.GetEpisodes>(
       () => _i686.GetEpisodes(gh<_i992.EpisodeRepository>()),
+    );
+    gh.lazySingleton<_i119.GetEpisodeCharactersByIds>(
+      () => _i119.GetEpisodeCharactersByIds(gh<_i992.EpisodeRepository>()),
     );
     gh.lazySingleton<_i506.GetEpisodesByIds>(
       () => _i506.GetEpisodesByIds(gh<_i992.EpisodeRepository>()),
@@ -116,6 +120,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i332.GetLocations>(
       () => _i332.GetLocations(gh<_i332.LocationRepository>()),
+    );
+    gh.lazySingleton<_i872.GetCharacterById>(
+      () => _i872.GetCharacterById(gh<_i842.CharacterRepository>()),
     );
     gh.lazySingleton<_i568.GetCharacters>(
       () => _i568.GetCharacters(gh<_i842.CharacterRepository>()),
@@ -129,6 +136,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i266.GetFavoriteCharacters>(),
         gh<_i757.ToggleFavoriteCharacter>(),
       ),
+    );
+    gh.factory<_i439.CharacterDetailCubit>(
+      () => _i439.CharacterDetailCubit(gh<_i872.GetCharacterById>()),
     );
     gh.factory<_i730.EpisodeListBloc>(
       () => _i730.EpisodeListBloc(gh<_i686.GetEpisodes>()),

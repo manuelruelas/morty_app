@@ -50,7 +50,9 @@ class FavoriteCharactersPage extends StatelessWidget {
                         MaterialPageRoute<void>(
                           builder: (final routeContext) => BlocProvider.value(
                             value: characterBloc,
-                            child: CharacterDetailPage(character: character),
+                            child: CharacterDetailPage(
+                              characterId: character.id,
+                            ),
                           ),
                         ),
                       );

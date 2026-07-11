@@ -159,4 +159,56 @@ void main() {
 
     expect(() => dataSource.getCharacters(page: 1), throwsException);
   });
+
+  test(
+    'retorna personaje cuando getCharacterById responde correctamente',
+    () async {
+      when(() => mockDio.get<Map<String, dynamic>>('/character/1')).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          requestOptions: RequestOptions(path: '/character/1'),
+          data: {
+            'id': 1,
+            'name': 'Rick Sanchez',
+            'status': 'Alive',
+            'species': 'Human',
+            'type': '',
+            'gender': 'Male',
+            'image': 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+            'origin': {
+              'name': 'Earth (C-137)',
+              'url': 'https://rickandmortyapi.com/api/location/1',
+            },
+            'location': {
+              'name': 'Citadel of Ricks',
+              'url': 'https://rickandmortyapi.com/api/location/3',
+            },
+            'episode': ['https://rickandmortyapi.com/api/episode/1'],
+          },
+          statusCode: 200,
+        ),
+      );
+
+      final result = await dataSource.getCharacterById(id: 1);
+
+      expect(result.id, 1);
+      expect(result.name, 'Rick Sanchez');
+      verify(() => mockDio.get<Map<String, dynamic>>('/character/1')).called(1);
+    },
+  );
+
+  test('lanza excepcion cuando getCharacterById falla', () async {
+    when(() => mockDio.get<Map<String, dynamic>>('/character/999')).thenThrow(
+      DioException(
+        requestOptions: RequestOptions(path: '/character/999'),
+        response: Response(
+          requestOptions: RequestOptions(path: '/character/999'),
+          statusCode: 404,
+          data: {'error': 'Character not found'},
+        ),
+        type: DioExceptionType.badResponse,
+      ),
+    );
+
+    expect(() => dataSource.getCharacterById(id: 999), throwsException);
+  });
 }
