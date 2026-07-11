@@ -5,6 +5,7 @@ import 'package:morty_app/features/character/domain/repositories/character_repos
 import 'package:morty_app/features/character/domain/usecases/get_characters.dart';
 import 'package:morty_app/features/character/domain/usecases/get_favorite_characters.dart';
 import 'package:morty_app/features/character/domain/usecases/toggle_favorite_character.dart';
+import 'package:morty_app/features/episode/domain/usecases/get_episodes.dart';
 
 class MockCharacterRemoteDataSource extends Mock
     implements CharacterRemoteDataSource {}
@@ -20,6 +21,8 @@ class MockCharacterRepository extends Mock implements CharacterRepository {}
 class MockGetCharacters extends Mock implements GetCharacters {}
 
 class MockGetFavoriteCharacters extends Mock implements GetFavoriteCharacters {}
+
+class MockGetEpisodes extends Mock implements GetEpisodes {}
 
 class MockToggleFavoriteCharacter extends Mock
     implements ToggleFavoriteCharacter {}
