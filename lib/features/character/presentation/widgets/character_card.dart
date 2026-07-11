@@ -75,29 +75,32 @@ class CharacterCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      character.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          character.name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          tooltip: isFavorite
+                              ? 'Quitar de favoritos'
+                              : 'Agregar a favoritos',
+                          onPressed: onFavoriteTap,
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.red : null,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: IconButton(
-                        visualDensity: VisualDensity.compact,
-                        tooltip: isFavorite
-                            ? 'Quitar de favoritos'
-                            : 'Agregar a favoritos',
-                        onPressed: onFavoriteTap,
-                        icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : null,
-                        ),
-                      ),
-                    ),
+
                     const SizedBox(height: 4),
                     Row(
                       children: [
