@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
+import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/character/presentation/pages/character_detail_page.dart';
 import 'package:morty_app/features/episode/domain/entities/episode_character.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_characters_cubit.dart';
@@ -20,7 +21,10 @@ class LocationDetailPage extends StatelessWidget {
       create: (final context) =>
           getIt<EpisodeCharactersCubit>()..loadCharacters(location.residentIds),
       child: Scaffold(
-        appBar: AppBar(title: Text(location.name)),
+        appBar: AppBar(
+          title: Text(location.name),
+          actions: const [ThemeToggleAction()],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

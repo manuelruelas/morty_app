@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
+import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/episode/presentation/bloc/episode_list_bloc.dart';
 import 'package:morty_app/features/episode/presentation/bloc/episode_list_event.dart';
 import 'package:morty_app/features/episode/presentation/bloc/episode_list_state.dart';
@@ -53,7 +54,10 @@ class _EpisodeListPageState extends State<EpisodeListPage> {
     return BlocProvider(
       create: (final _) => _episodeListBloc,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Episodios R&M')),
+        appBar: AppBar(
+          title: const Text('Episodios R&M'),
+          actions: const [ThemeToggleAction()],
+        ),
         body: Column(
           children: [
             Padding(

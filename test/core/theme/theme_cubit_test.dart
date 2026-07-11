@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:morty_app/core/theme/theme_cubit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late ThemeCubit cubit;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
     cubit = ThemeCubit();
   });
 
@@ -23,8 +27,10 @@ void main() {
     'toglea a dark cuando está en system (en plataforma dark)',
     build: () => cubit,
     seed: () => ThemeMode.system,
-    act: (final cubit) {
-      cubit.toggleTheme(_MockBuildContext(platformBrightness: Brightness.dark));
+    act: (final cubit) async {
+      await cubit.toggleTheme(
+        _MockBuildContext(platformBrightness: Brightness.dark),
+      );
     },
     expect: () => [ThemeMode.light],
   );
@@ -33,8 +39,8 @@ void main() {
     'alterna entre dark y light',
     build: () => cubit,
     seed: () => ThemeMode.dark,
-    act: (final cubit) {
-      cubit.toggleTheme(_MockBuildContext());
+    act: (final cubit) async {
+      await cubit.toggleTheme(_MockBuildContext());
     },
     expect: () => [ThemeMode.light],
   );
@@ -43,8 +49,8 @@ void main() {
     'alterna de light a dark',
     build: () => cubit,
     seed: () => ThemeMode.light,
-    act: (final cubit) {
-      cubit.toggleTheme(_MockBuildContext());
+    act: (final cubit) async {
+      await cubit.toggleTheme(_MockBuildContext());
     },
     expect: () => [ThemeMode.dark],
   );
@@ -94,8 +100,4 @@ class _MockBuildContext extends Fake implements BuildContext {
     data: MediaQueryData(platformBrightness: platformBrightness),
     child: const SizedBox(),
   );
-
-  @override
-  MediaQueryData get mediaQuery =>
-      MediaQueryData(platformBrightness: platformBrightness);
 }

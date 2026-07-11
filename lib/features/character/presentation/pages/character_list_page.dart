@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:morty_app/core/theme/theme_cubit.dart';
+import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
 import 'package:morty_app/features/character/presentation/pages/character_detail_page.dart';
 import 'package:morty_app/features/character/presentation/widgets/character_card.dart';
@@ -283,12 +283,7 @@ class _CharacterListPageState extends State<CharacterListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Personajes R&M'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.brightness_6),
-            onPressed: () => context.read<ThemeCubit>().toggleTheme(context),
-          ),
-        ],
+        actions: const [ThemeToggleAction()],
       ),
       body: Column(
         children: [

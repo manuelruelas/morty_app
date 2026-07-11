@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_bloc.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_event.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_state.dart';
@@ -12,7 +13,10 @@ class FavoriteCharactersPage extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Favoritos')),
+      appBar: AppBar(
+        title: const Text('Favoritos'),
+        actions: const [ThemeToggleAction()],
+      ),
       body: BlocBuilder<CharacterBloc, CharacterState>(
         builder: (final context, final state) {
           if (state.favoriteCharacters.isEmpty) {

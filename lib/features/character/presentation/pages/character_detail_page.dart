@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
+import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_bloc.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_event.dart';
@@ -45,7 +46,10 @@ class _CharacterDetailView extends StatelessWidget {
             );
           case CharacterDetailStatusState.error:
             return Scaffold(
-              appBar: AppBar(title: const Text('Detalle del personaje')),
+              appBar: AppBar(
+                title: const Text('Detalle del personaje'),
+                actions: const [ThemeToggleAction()],
+              ),
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -120,6 +124,7 @@ class _CharacterLoadedView extends StatelessWidget {
                 expandedHeight: 350,
                 pinned: true,
                 actions: [
+                  const ThemeToggleAction(iconColor: Colors.white),
                   BlocBuilder<CharacterBloc, CharacterState>(
                     builder: (final context, final state) {
                       final isFavorite = state.isFavorite(character.id);
