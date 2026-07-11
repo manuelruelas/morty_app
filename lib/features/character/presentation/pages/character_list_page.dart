@@ -18,6 +18,9 @@ class CharacterListPage extends StatefulWidget {
 
 class _CharacterListPageState extends State<CharacterListPage> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _speciesController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
   bool _initialized = false;
 
   @override
@@ -38,6 +41,9 @@ class _CharacterListPageState extends State<CharacterListPage> {
         bloc.state.status == CharacterStatusState.initial) {
       bloc.add(const GetCharactersEvent());
     }
+    _nameController.text = bloc.state.currentNameFilter;
+    _speciesController.text = bloc.state.currentSpeciesFilter;
+    _typeController.text = bloc.state.currentTypeFilter;
     if (bloc.state.favoriteCharacterIds.isEmpty &&
         bloc.state.favoriteCharacters.isEmpty) {
       bloc.add(const LoadFavoriteCharactersEvent());
@@ -48,7 +54,23 @@ class _CharacterListPageState extends State<CharacterListPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _nameController.dispose();
+    _speciesController.dispose();
+    _typeController.dispose();
     super.dispose();
+  }
+
+  void _applyFilters() {
+    final bloc = context.read<CharacterBloc>();
+    bloc.add(
+      GetCharactersEvent(
+        name: _nameController.text.trim(),
+        status: bloc.state.currentStatusFilter,
+        species: _speciesController.text.trim(),
+        type: _typeController.text.trim(),
+        gender: bloc.state.currentGenderFilter,
+      ),
+    );
   }
 
   void _onScroll() {
@@ -86,23 +108,44 @@ class _CharacterListPageState extends State<CharacterListPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Buscar personaje...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onChanged: (final value) {
-                final bloc = context.read<CharacterBloc>();
-                bloc.add(
-                  GetCharactersEvent(
-                    name: value,
-                    status: bloc.state.currentStatusFilter,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    hintText: 'Buscar personaje...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                );
-              },
+                  onChanged: (final value) => _applyFilters(),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _speciesController,
+                  decoration: InputDecoration(
+                    hintText: 'Filtrar por especie...',
+                    prefixIcon: const Icon(Icons.pets),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onChanged: (final value) => _applyFilters(),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _typeController,
+                  decoration: InputDecoration(
+                    hintText: 'Filtrar por tipo...',
+                    prefixIcon: const Icon(Icons.category_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onChanged: (final value) => _applyFilters(),
+                ),
+              ],
             ),
           ),
           const FilterChipsHeader(),
@@ -130,6 +173,9 @@ class _CharacterListPageState extends State<CharacterListPage> {
                               GetCharactersEvent(
                                 name: state.currentNameFilter,
                                 status: state.currentStatusFilter,
+                                species: state.currentSpeciesFilter,
+                                type: state.currentTypeFilter,
+                                gender: state.currentGenderFilter,
                               ),
                             ),
                             child: const Text('Reintentar'),
@@ -213,48 +259,99 @@ class FilterChipsHeader extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    return BlocSelector<CharacterBloc, CharacterState, CharacterStatus?>(
-      selector: (final state) {
-        return state.currentStatusFilter;
-      },
+    return BlocSelector<CharacterBloc, CharacterState, CharacterState>(
+      selector: (final state) => state,
       builder: (final context, final state) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ChoiceChip(
-                label: const Text('Todos'),
-                selected: state == null,
-                onSelected: (final selected) {
-                  final bloc = context.read<CharacterBloc>();
-                  bloc.add(
-                    GetCharactersEvent(
-                      name: bloc.state.currentNameFilter,
-                      status: null,
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(width: 8),
-              ...CharacterStatus.values.map((final status) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(status.displayName),
-                    selected: state == status,
+              Text('Estado', style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Todos'),
+                    selected: state.currentStatusFilter == null,
                     onSelected: (final selected) {
                       final bloc = context.read<CharacterBloc>();
                       bloc.add(
                         GetCharactersEvent(
                           name: bloc.state.currentNameFilter,
-                          status: selected ? status : null,
+                          status: null,
+                          species: bloc.state.currentSpeciesFilter,
+                          type: bloc.state.currentTypeFilter,
+                          gender: bloc.state.currentGenderFilter,
                         ),
                       );
                     },
                   ),
-                );
-              }),
+                  ...CharacterStatus.values.map((final status) {
+                    return ChoiceChip(
+                      label: Text(status.displayName),
+                      selected: state.currentStatusFilter == status,
+                      onSelected: (final selected) {
+                        final bloc = context.read<CharacterBloc>();
+                        bloc.add(
+                          GetCharactersEvent(
+                            name: bloc.state.currentNameFilter,
+                            status: selected ? status : null,
+                            species: bloc.state.currentSpeciesFilter,
+                            type: bloc.state.currentTypeFilter,
+                            gender: bloc.state.currentGenderFilter,
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text('Género', style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Todos'),
+                    selected: state.currentGenderFilter == null,
+                    onSelected: (final selected) {
+                      final bloc = context.read<CharacterBloc>();
+                      bloc.add(
+                        GetCharactersEvent(
+                          name: bloc.state.currentNameFilter,
+                          status: bloc.state.currentStatusFilter,
+                          species: bloc.state.currentSpeciesFilter,
+                          type: bloc.state.currentTypeFilter,
+                          gender: null,
+                        ),
+                      );
+                    },
+                  ),
+                  ...CharacterGender.values.map((final gender) {
+                    return ChoiceChip(
+                      label: Text(gender.displayName),
+                      selected: state.currentGenderFilter == gender,
+                      onSelected: (final selected) {
+                        final bloc = context.read<CharacterBloc>();
+                        bloc.add(
+                          GetCharactersEvent(
+                            name: bloc.state.currentNameFilter,
+                            status: bloc.state.currentStatusFilter,
+                            species: bloc.state.currentSpeciesFilter,
+                            type: bloc.state.currentTypeFilter,
+                            gender: selected ? gender : null,
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                ],
+              ),
             ],
           ),
         );

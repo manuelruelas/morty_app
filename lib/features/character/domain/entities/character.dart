@@ -17,6 +17,26 @@ enum CharacterStatus {
   }
 }
 
+enum CharacterGender {
+  female,
+  male,
+  genderless,
+  unknown;
+
+  String get displayName {
+    switch (this) {
+      case CharacterGender.female:
+        return 'Female';
+      case CharacterGender.male:
+        return 'Male';
+      case CharacterGender.genderless:
+        return 'Genderless';
+      case CharacterGender.unknown:
+        return 'Unknown';
+    }
+  }
+}
+
 class Character extends Equatable {
   final int id;
   final String name;

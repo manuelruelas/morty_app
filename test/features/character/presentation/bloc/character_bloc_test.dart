@@ -72,7 +72,14 @@ void main() {
     'Emite loading-> success cuando GetCharactersEvent devuelve personajes',
     build: () {
       when(
-        () => mockGetCharacters(page: 1),
+        () => mockGetCharacters(
+          page: 1,
+          name: null,
+          status: null,
+          species: null,
+          type: null,
+          gender: null,
+        ),
       ).thenAnswer((_) async => const Right([rick]));
 
       return bloc;
@@ -92,7 +99,14 @@ void main() {
     'emite loading -> empty cuando búsqueda no tiene resultados',
     build: () {
       when(
-        () => mockGetCharacters(page: 1, name: 'zzzz', status: null),
+        () => mockGetCharacters(
+          page: 1,
+          name: 'zzzz',
+          status: null,
+          species: null,
+          type: null,
+          gender: null,
+        ),
       ).thenAnswer((_) async => const Right([]));
       return bloc;
     },
@@ -118,7 +132,14 @@ void main() {
     'emite loading -> error cuando use case falla',
     build: () {
       when(
-        () => mockGetCharacters(page: 1, name: null, status: null),
+        () => mockGetCharacters(
+          page: 1,
+          name: null,
+          status: null,
+          species: null,
+          type: null,
+          gender: null,
+        ),
       ).thenAnswer((_) async => const Left(ServerFailure('API caída')));
       return bloc;
     },
@@ -145,7 +166,14 @@ void main() {
     'paginación: emite loadingMore -> success con lista acumulada',
     build: () {
       when(
-        () => mockGetCharacters(page: 2, name: null, status: null),
+        () => mockGetCharacters(
+          page: 2,
+          name: null,
+          status: null,
+          species: null,
+          type: null,
+          gender: null,
+        ),
       ).thenAnswer((_) async => const Right([morty]));
       return bloc;
     },
@@ -188,6 +216,9 @@ void main() {
           page: any(named: 'page'),
           name: any(named: 'name'),
           status: any(named: 'status'),
+          species: any(named: 'species'),
+          type: any(named: 'type'),
+          gender: any(named: 'gender'),
         ),
       );
     },
@@ -209,6 +240,9 @@ void main() {
           page: any(named: 'page'),
           name: any(named: 'name'),
           status: any(named: 'status'),
+          species: any(named: 'species'),
+          type: any(named: 'type'),
+          gender: any(named: 'gender'),
         ),
       );
     },
@@ -218,7 +252,14 @@ void main() {
     'paginacion: si falla getCharacters vuelve a success sin romper lista',
     build: () {
       when(
-        () => mockGetCharacters(page: 2, name: null, status: null),
+        () => mockGetCharacters(
+          page: 2,
+          name: null,
+          status: null,
+          species: null,
+          type: null,
+          gender: null,
+        ),
       ).thenAnswer((_) async => const Left(ServerFailure('boom')));
       return bloc;
     },
@@ -249,7 +290,14 @@ void main() {
     'paginacion: si pagina siguiente viene vacia marca hasReachedMax=true',
     build: () {
       when(
-        () => mockGetCharacters(page: 2, name: null, status: null),
+        () => mockGetCharacters(
+          page: 2,
+          name: null,
+          status: null,
+          species: null,
+          type: null,
+          gender: null,
+        ),
       ).thenAnswer((_) async => const Right([]));
       return bloc;
     },
@@ -370,6 +418,9 @@ void main() {
           page: 1,
           name: 'rick',
           status: CharacterStatus.alive,
+          species: null,
+          type: null,
+          gender: null,
         ),
       ).thenAnswer((_) async => const Right([rick]));
       return bloc;
@@ -393,6 +444,109 @@ void main() {
         currentStatusFilter: CharacterStatus.alive,
         currentPage: 1,
         hasReachedMax: false,
+      ),
+    ],
+  );
+
+  blocTest<CharacterBloc, CharacterState>(
+    'GetCharactersEvent propaga species, type y gender',
+    build: () {
+      when(
+        () => mockGetCharacters(
+          page: 1,
+          name: 'rick',
+          status: CharacterStatus.alive,
+          species: 'Human',
+          type: 'Scientist',
+          gender: CharacterGender.male,
+        ),
+      ).thenAnswer((_) async => const Right([rick]));
+      return bloc;
+    },
+    act: (final bloc) => bloc.add(
+      const GetCharactersEvent(
+        name: 'rick',
+        status: CharacterStatus.alive,
+        species: 'Human',
+        type: 'Scientist',
+        gender: CharacterGender.male,
+      ),
+    ),
+    wait: const Duration(milliseconds: 600),
+    expect: () => [
+      const CharacterState(
+        status: CharacterStatusState.loading,
+        currentNameFilter: 'rick',
+        currentStatusFilter: CharacterStatus.alive,
+        currentSpeciesFilter: 'Human',
+        currentTypeFilter: 'Scientist',
+        currentGenderFilter: CharacterGender.male,
+        currentPage: 1,
+        hasReachedMax: false,
+      ),
+      const CharacterState(
+        status: CharacterStatusState.success,
+        characters: [rick],
+        currentNameFilter: 'rick',
+        currentStatusFilter: CharacterStatus.alive,
+        currentSpeciesFilter: 'Human',
+        currentTypeFilter: 'Scientist',
+        currentGenderFilter: CharacterGender.male,
+        currentPage: 1,
+        hasReachedMax: false,
+      ),
+    ],
+  );
+
+  blocTest<CharacterBloc, CharacterState>(
+    'LoadNextPageEvent conserva todos los filtros activos',
+    build: () {
+      when(
+        () => mockGetCharacters(
+          page: 2,
+          name: 'rick',
+          status: CharacterStatus.alive,
+          species: 'Human',
+          type: 'Scientist',
+          gender: CharacterGender.male,
+        ),
+      ).thenAnswer((_) async => const Right([morty]));
+      return bloc;
+    },
+    seed: () => const CharacterState(
+      status: CharacterStatusState.success,
+      characters: [rick],
+      currentPage: 1,
+      hasReachedMax: false,
+      currentNameFilter: 'rick',
+      currentStatusFilter: CharacterStatus.alive,
+      currentSpeciesFilter: 'Human',
+      currentTypeFilter: 'Scientist',
+      currentGenderFilter: CharacterGender.male,
+    ),
+    act: (final bloc) => bloc.add(LoadNextPageEvent()),
+    expect: () => [
+      const CharacterState(
+        status: CharacterStatusState.loadingMore,
+        characters: [rick],
+        currentPage: 1,
+        hasReachedMax: false,
+        currentNameFilter: 'rick',
+        currentStatusFilter: CharacterStatus.alive,
+        currentSpeciesFilter: 'Human',
+        currentTypeFilter: 'Scientist',
+        currentGenderFilter: CharacterGender.male,
+      ),
+      const CharacterState(
+        status: CharacterStatusState.success,
+        characters: [rick, morty],
+        currentPage: 2,
+        hasReachedMax: true,
+        currentNameFilter: 'rick',
+        currentStatusFilter: CharacterStatus.alive,
+        currentSpeciesFilter: 'Human',
+        currentTypeFilter: 'Scientist',
+        currentGenderFilter: CharacterGender.male,
       ),
     ],
   );

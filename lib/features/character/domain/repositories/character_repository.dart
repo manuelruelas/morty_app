@@ -7,6 +7,9 @@ abstract class CharacterRepository {
     required final int page,
     final String? name,
     final CharacterStatus? status,
+    final String? species,
+    final String? type,
+    final CharacterGender? gender,
   });
 
   Future<Either<Failure, Character>> getCharacterById({required final int id});

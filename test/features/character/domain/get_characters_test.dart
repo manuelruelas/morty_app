@@ -42,6 +42,9 @@ void main() {
           page: 1,
           name: 'rick',
           status: CharacterStatus.alive,
+          species: 'Human',
+          type: 'Scientist',
+          gender: CharacterGender.male,
         ),
       ).thenAnswer((_) async => const Right(tCharacters));
 
@@ -49,6 +52,9 @@ void main() {
         page: 1,
         name: 'rick',
         status: CharacterStatus.alive,
+        species: 'Human',
+        type: 'Scientist',
+        gender: CharacterGender.male,
       );
 
       expect(result, const Right<Failure, List<Character>>(tCharacters));
@@ -57,6 +63,9 @@ void main() {
           page: 1,
           name: 'rick',
           status: CharacterStatus.alive,
+          species: 'Human',
+          type: 'Scientist',
+          gender: CharacterGender.male,
         ),
       ).called(1);
       verifyNoMoreInteractions(mockRepository);
@@ -65,7 +74,14 @@ void main() {
 
   test('debe propagar Left(Failure) del repository', () async {
     when(
-      () => mockRepository.getCharacters(page: 1, name: null, status: null),
+      () => mockRepository.getCharacters(
+        page: 1,
+        name: null,
+        status: null,
+        species: null,
+        type: null,
+        gender: null,
+      ),
     ).thenAnswer((_) async => const Left(ServerFailure('Server down')));
 
     final result = await useCase(page: 1);
@@ -75,7 +91,14 @@ void main() {
       const Left<Failure, List<Character>>(ServerFailure('Server down')),
     );
     verify(
-      () => mockRepository.getCharacters(page: 1, name: null, status: null),
+      () => mockRepository.getCharacters(
+        page: 1,
+        name: null,
+        status: null,
+        species: null,
+        type: null,
+        gender: null,
+      ),
     ).called(1);
   });
 }
