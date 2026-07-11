@@ -40,7 +40,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
       if (e.response?.statusCode == 404) {
         return const [];
       }
-      throw Exception('Failed to load locations: ${e.message}');
+      rethrow;
     }
   }
 }

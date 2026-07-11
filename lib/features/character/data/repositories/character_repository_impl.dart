@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:morty_app/core/errors/failure_mapper.dart';
 import 'package:morty_app/core/errors/failures.dart';
 import 'package:morty_app/features/character/data/datasources/local/character_local_data_source.dart';
 import 'package:morty_app/features/character/data/datasources/remote/character_remote_data_source.dart';
@@ -38,7 +39,13 @@ class CharacterRepositoryImpl implements CharacterRepository {
           .toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure('Error fetching characters: ${e.toString()}'));
+      return Left(
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar los personajes. Intentalo nuevamente.',
+        ),
+      );
     }
   }
 
@@ -49,7 +56,11 @@ class CharacterRepositoryImpl implements CharacterRepository {
       return Right(favorites);
     } catch (e) {
       return Left(
-        CacheFailure('Error reading favorite characters: ${e.toString()}'),
+        FailureMapper.mapCacheError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar tu lista de favoritos. Intentalo nuevamente.',
+        ),
       );
     }
   }
@@ -72,7 +83,11 @@ class CharacterRepositoryImpl implements CharacterRepository {
       return const Right(true);
     } catch (e) {
       return Left(
-        CacheFailure('Error updating favorite character: ${e.toString()}'),
+        FailureMapper.mapCacheError(
+          e,
+          fallbackMessage:
+              'No pudimos actualizar el favorito. Intentalo nuevamente.',
+        ),
       );
     }
   }

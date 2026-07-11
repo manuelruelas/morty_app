@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:morty_app/core/errors/failure_mapper.dart';
 import 'package:morty_app/core/errors/failures.dart';
 import 'package:morty_app/features/episode/data/datasources/remote/episode_remote_data_source.dart';
 import 'package:morty_app/features/episode/data/models/episode_character_model.dart';
@@ -29,7 +30,13 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
           .toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure('Error fetching episodes: ${e.toString()}'));
+      return Left(
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar los episodios. Intentalo nuevamente.',
+        ),
+      );
     }
   }
 
@@ -44,7 +51,13 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
           .toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure('Error fetching episodes: ${e.toString()}'));
+      return Left(
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar los episodios. Intentalo nuevamente.',
+        ),
+      );
     }
   }
 
@@ -60,7 +73,11 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
       return Right(entities);
     } catch (e) {
       return Left(
-        ServerFailure('Error fetching episode characters: ${e.toString()}'),
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar los personajes del episodio. Intentalo nuevamente.',
+        ),
       );
     }
   }

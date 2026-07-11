@@ -48,7 +48,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       if (e.response?.statusCode == 404) {
         return const [];
       }
-      throw Exception('Failed to load episodes: ${e.message}');
+      rethrow;
     }
   }
 
@@ -82,7 +82,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       if (e.response?.statusCode == 404) {
         return const [];
       }
-      throw Exception('Failed to load episodes: ${e.message}');
+      rethrow;
     }
   }
 
@@ -116,7 +116,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       if (e.response?.statusCode == 404) {
         return const [];
       }
-      throw Exception('Failed to load episode characters: ${e.message}');
+      rethrow;
     }
   }
 }
