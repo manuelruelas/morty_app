@@ -8,7 +8,7 @@ part 'api_response_model.g.dart';
 abstract class CharacterApiResponseModel with _$CharacterApiResponseModel {
   const factory CharacterApiResponseModel({
     required final CharacterInfoModel info,
-    required final List<CharacterModel> results, // 💡 ¡Adiós al List<dynamic>!
+    required final List<CharacterModel> results,
   }) = _CharacterApiResponseModel;
 
   factory CharacterApiResponseModel.fromJson(final Map<String, dynamic> json) =>
