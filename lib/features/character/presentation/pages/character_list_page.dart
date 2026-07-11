@@ -90,12 +90,8 @@ class _CharacterListPageState extends State<CharacterListPage> {
 
   Future<void> _openAdvancedFilters() async {
     final bloc = context.read<CharacterBloc>();
-    final speciesController = TextEditingController(
-      text: bloc.state.currentSpeciesFilter,
-    );
-    final typeController = TextEditingController(
-      text: bloc.state.currentTypeFilter,
-    );
+    var speciesValue = bloc.state.currentSpeciesFilter;
+    var typeValue = bloc.state.currentTypeFilter;
     CharacterStatus? selectedStatus = bloc.state.currentStatusFilter;
     CharacterGender? selectedGender = bloc.state.currentGenderFilter;
 
@@ -128,8 +124,8 @@ class _CharacterListPageState extends State<CharacterListPage> {
                           TextButton(
                             onPressed: () {
                               setModalState(() {
-                                speciesController.clear();
-                                typeController.clear();
+                                speciesValue = '';
+                                typeValue = '';
                                 selectedStatus = null;
                                 selectedGender = null;
                               });
@@ -139,8 +135,8 @@ class _CharacterListPageState extends State<CharacterListPage> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      TextField(
-                        controller: speciesController,
+                      TextFormField(
+                        initialValue: speciesValue,
                         decoration: InputDecoration(
                           hintText: 'Filtrar por especie...',
                           prefixIcon: const Icon(Icons.pets),
@@ -148,10 +144,13 @@ class _CharacterListPageState extends State<CharacterListPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        onChanged: (final value) {
+                          speciesValue = value;
+                        },
                       ),
                       const SizedBox(height: 12),
-                      TextField(
-                        controller: typeController,
+                      TextFormField(
+                        initialValue: typeValue,
                         decoration: InputDecoration(
                           hintText: 'Filtrar por tipo...',
                           prefixIcon: const Icon(Icons.category_outlined),
@@ -159,6 +158,9 @@ class _CharacterListPageState extends State<CharacterListPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        onChanged: (final value) {
+                          typeValue = value;
+                        },
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -229,14 +231,14 @@ class _CharacterListPageState extends State<CharacterListPage> {
                         width: double.infinity,
                         child: FilledButton.icon(
                           onPressed: () {
-                            _speciesController.text = speciesController.text;
-                            _typeController.text = typeController.text;
+                            _speciesController.text = speciesValue;
+                            _typeController.text = typeValue;
                             bloc.add(
                               GetCharactersEvent(
                                 name: _nameController.text.trim(),
                                 status: selectedStatus,
-                                species: speciesController.text.trim(),
-                                type: typeController.text.trim(),
+                                species: speciesValue.trim(),
+                                type: typeValue.trim(),
                                 gender: selectedGender,
                               ),
                             );
@@ -255,9 +257,6 @@ class _CharacterListPageState extends State<CharacterListPage> {
         );
       },
     );
-
-    speciesController.dispose();
-    typeController.dispose();
   }
 
   void _onScroll() {
@@ -297,22 +296,27 @@ class _CharacterListPageState extends State<CharacterListPage> {
             padding: const EdgeInsets.all(12.0),
             child: Column(
               children: [
-                TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Buscar personaje...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          hintText: 'Buscar personaje...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onChanged: (final value) => _applyFilters(),
+                      ),
                     ),
-                  ),
-                  onChanged: (final value) => _applyFilters(),
+                    const SizedBox(width: 12),
+                    CharacterFilterButton(onOpenFilters: _openAdvancedFilters),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                CharacterFilterBar(
-                  onOpenFilters: _openAdvancedFilters,
-                  onClearFilters: _clearAdvancedFilters,
-                ),
+                const SizedBox(height: 8),
+                CharacterFilterSummary(onClearFilters: _clearAdvancedFilters),
               ],
             ),
           ),
@@ -421,31 +425,60 @@ class _CharacterListPageState extends State<CharacterListPage> {
   }
 }
 
-class CharacterFilterBar extends StatelessWidget {
+class CharacterFilterButton extends StatelessWidget {
   final VoidCallback onOpenFilters;
-  final VoidCallback onClearFilters;
 
-  const CharacterFilterBar({
-    required this.onOpenFilters,
-    required this.onClearFilters,
-    super.key,
-  });
+  const CharacterFilterButton({required this.onOpenFilters, super.key});
 
   @override
   Widget build(final BuildContext context) {
     return BlocSelector<CharacterBloc, CharacterState, CharacterState>(
       selector: (final state) => state,
       builder: (final context, final state) {
-        final activeFilters = _buildActiveFiltersSummary(state);
-        final hasAdvancedFilters =
-            state.currentStatusFilter != null ||
-            state.currentGenderFilter != null ||
-            state.currentSpeciesFilter.isNotEmpty ||
-            state.currentTypeFilter.isNotEmpty;
+        final hasAdvancedFilters = _hasAdvancedFilters(state);
+
+        return Badge(
+          isLabelVisible: hasAdvancedFilters,
+          label: Text('${_advancedFilterCount(state)}'),
+          child: SizedBox(
+            height: 56,
+            child: OutlinedButton(
+              onPressed: onOpenFilters,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Icon(Icons.tune),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CharacterFilterSummary extends StatelessWidget {
+  final VoidCallback onClearFilters;
+
+  const CharacterFilterSummary({required this.onClearFilters, super.key});
+
+  @override
+  Widget build(final BuildContext context) {
+    return BlocSelector<CharacterBloc, CharacterState, CharacterState>(
+      selector: (final state) => state,
+      builder: (final context, final state) {
+        final activeFilters = _buildActiveFilterLabels(state);
+        final hasAdvancedFilters = activeFilters.isNotEmpty;
+
+        if (!hasAdvancedFilters) {
+          return const SizedBox.shrink();
+        }
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Theme.of(
@@ -457,32 +490,28 @@ class CharacterFilterBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onOpenFilters,
-                      icon: const Icon(Icons.tune),
-                      label: Text(
-                        hasAdvancedFilters
-                            ? 'Filtros avanzados (${_advancedFilterCount(state)})'
-                            : 'Filtros avanzados',
-                      ),
-                    ),
+                  Text(
+                    'Filtros activos',
+                    style: Theme.of(context).textTheme.labelLarge,
                   ),
-                  if (hasAdvancedFilters) ...[
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: onClearFilters,
-                      child: const Text('Limpiar'),
-                    ),
-                  ],
+                  const Spacer(),
+                  TextButton(
+                    onPressed: onClearFilters,
+                    child: const Text('Limpiar'),
+                  ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                activeFilters,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall,
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: activeFilters
+                    .map(
+                      (final filter) => Chip(
+                        visualDensity: VisualDensity.compact,
+                        label: Text(filter),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
@@ -490,6 +519,13 @@ class CharacterFilterBar extends StatelessWidget {
       },
     );
   }
+}
+
+bool _hasAdvancedFilters(final CharacterState state) {
+  return state.currentStatusFilter != null ||
+      state.currentGenderFilter != null ||
+      state.currentSpeciesFilter.isNotEmpty ||
+      state.currentTypeFilter.isNotEmpty;
 }
 
 int _advancedFilterCount(final CharacterState state) {
@@ -509,7 +545,7 @@ int _advancedFilterCount(final CharacterState state) {
   return count;
 }
 
-String _buildActiveFiltersSummary(final CharacterState state) {
+List<String> _buildActiveFilterLabels(final CharacterState state) {
   final filters = <String>[];
 
   if (state.currentStatusFilter != null) {
@@ -525,9 +561,5 @@ String _buildActiveFiltersSummary(final CharacterState state) {
     filters.add('Tipo: ${state.currentTypeFilter}');
   }
 
-  if (filters.isEmpty) {
-    return 'Sin filtros avanzados aplicados';
-  }
-
-  return filters.join('  •  ');
+  return filters;
 }
