@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morty_app/core/di/injection.dart';
+import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/location/presentation/bloc/location_bloc.dart';
 import 'package:morty_app/features/location/presentation/bloc/location_event.dart';
 import 'package:morty_app/features/location/presentation/bloc/location_state.dart';
@@ -66,7 +67,10 @@ class _LocationListPageState extends State<LocationListPage> {
     return BlocProvider(
       create: (final _) => _locationBloc,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Lugares R&M')),
+        appBar: AppBar(
+          title: const Text('Lugares R&M'),
+          actions: const [ThemeToggleAction()],
+        ),
         body: Column(
           children: [
             Padding(
