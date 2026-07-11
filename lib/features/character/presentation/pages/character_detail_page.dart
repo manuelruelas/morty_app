@@ -5,6 +5,8 @@ import 'package:morty_app/features/character/domain/entities/character.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_bloc.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_event.dart';
 import 'package:morty_app/features/character/presentation/bloc/character_state.dart';
+import 'package:morty_app/features/character/presentation/cubit/character_detail_cubit.dart';
+import 'package:morty_app/features/character/presentation/cubit/character_detail_state.dart';
 import 'package:morty_app/features/episode/domain/entities/episode.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_cubit.dart';
 import 'package:morty_app/features/episode/presentation/cubit/episode_state.dart';
@@ -12,9 +14,86 @@ import 'package:morty_app/features/episode/presentation/pages/episode_detail_pag
 import 'package:morty_app/features/location/presentation/pages/location_list_page.dart';
 
 class CharacterDetailPage extends StatelessWidget {
+  final int characterId;
+
+  const CharacterDetailPage({super.key, required this.characterId});
+
+  @override
+  Widget build(final BuildContext context) {
+    return BlocProvider(
+      create: (final context) =>
+          getIt<CharacterDetailCubit>()..loadCharacter(characterId),
+      child: _CharacterDetailView(characterId: characterId),
+    );
+  }
+}
+
+class _CharacterDetailView extends StatelessWidget {
+  final int characterId;
+
+  const _CharacterDetailView({required this.characterId});
+
+  @override
+  Widget build(final BuildContext context) {
+    return BlocBuilder<CharacterDetailCubit, CharacterDetailState>(
+      builder: (final context, final state) {
+        switch (state.status) {
+          case CharacterDetailStatusState.initial:
+          case CharacterDetailStatusState.loading:
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          case CharacterDetailStatusState.error:
+            return Scaffold(
+              appBar: AppBar(title: const Text('Detalle del personaje')),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        state.errorMessage,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () => context
+                          .read<CharacterDetailCubit>()
+                          .loadCharacter(characterId),
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          case CharacterDetailStatusState.success:
+            final character = state.character;
+            if (character == null) {
+              return const Scaffold(
+                body: Center(child: Text('No se encontro el personaje.')),
+              );
+            }
+
+            return _CharacterLoadedView(
+              characterId: characterId,
+              character: character,
+            );
+        }
+      },
+    );
+  }
+}
+
+class _CharacterLoadedView extends StatelessWidget {
+  final int characterId;
   final Character character;
 
-  const CharacterDetailPage({super.key, required this.character});
+  const _CharacterLoadedView({
+    required this.characterId,
+    required this.character,
+  });
 
   @override
   Widget build(final BuildContext context) {
@@ -31,201 +110,205 @@ class CharacterDetailPage extends StatelessWidget {
       create: (final context) =>
           getIt<EpisodeCubit>()..loadEpisodes(episodeIds),
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 350,
-              pinned: true,
-
-              actions: [
-                BlocBuilder<CharacterBloc, CharacterState>(
-                  builder: (final context, final state) {
-                    final isFavorite = state.isFavorite(character.id);
-                    return IconButton(
-                      tooltip: isFavorite
-                          ? 'Quitar de favoritos'
-                          : 'Agregar a favoritos',
-                      onPressed: () {
-                        context.read<CharacterBloc>().add(
-                          ToggleFavoriteCharacterEvent(character: character),
-                        );
-                      },
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.redAccent : Colors.white,
-                      ),
-                    );
-                  },
-                ),
-              ],
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(
-                  character.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        offset: Offset(0, 2),
-                        blurRadius: 4.0,
-                        color: Colors.black54,
-                      ),
-                    ],
-                  ),
-                ),
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Hero(
-                      tag: 'character-image-${character.id}',
-                      child: Image.network(
-                        character.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (final context, final error, final stackTrace) =>
-                                const Center(child: Icon(Icons.broken_image)),
-                      ),
-                    ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.transparent, Colors.black87],
-                          stops: [0.6, 1.0],
+        body: RefreshIndicator(
+          onRefresh: () =>
+              context.read<CharacterDetailCubit>().loadCharacter(characterId),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 350,
+                pinned: true,
+                actions: [
+                  BlocBuilder<CharacterBloc, CharacterState>(
+                    builder: (final context, final state) {
+                      final isFavorite = state.isFavorite(character.id);
+                      return IconButton(
+                        tooltip: isFavorite
+                            ? 'Quitar de favoritos'
+                            : 'Agregar a favoritos',
+                        onPressed: () {
+                          context.read<CharacterBloc>().add(
+                            ToggleFavoriteCharacterEvent(character: character),
+                          );
+                        },
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.redAccent : Colors.white,
                         ),
-                      ),
+                      );
+                    },
+                  ),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(
+                    character.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 2),
+                          blurRadius: 4.0,
+                          color: Colors.black54,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.all(16.0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  const SizedBox(height: 8),
-                  Row(
+                  ),
+                  background: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
+                      Hero(
+                        tag: 'character-image-${character.id}',
+                        child: Image.network(
+                          character.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (final context, final error, final stackTrace) =>
+                                  const Center(child: Icon(Icons.broken_image)),
                         ),
+                      ),
+                      const DecoratedBox(
                         decoration: BoxDecoration(
-                          color: statusColor.withAlpha((0.15 * 255).toInt()),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: statusColor, width: 1.5),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: statusColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              character.status.displayName.toUpperCase(),
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: statusColor,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ],
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.transparent, Colors.black87],
+                            stops: [0.6, 1.0],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Informacion General',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoCard(
-                    context,
-                    icon: Icons.face,
-                    title: 'Especie',
-                    value: character.species,
-                  ),
-                  _buildInfoCard(
-                    context,
-                    icon: Icons.person,
-                    title: 'Genero',
-                    value: character.gender,
-                  ),
-                  _buildInfoCard(
-                    context,
-                    icon: Icons.category,
-                    title: 'Tipo',
-                    value: character.type,
-                  ),
-                  _buildInfoCard(
-                    context,
-                    icon: Icons.explore,
-                    title: 'Origen',
-                    value: character.originName,
-                    onTap: character.originLocationId == null
-                        ? null
-                        : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (final context) => LocationListPage(
-                                  initialName: character.originName,
-                                ),
-                              ),
-                            );
-                          },
-                  ),
-                  _buildInfoCard(
-                    context,
-                    icon: Icons.location_on,
-                    title: 'Ubicacion actual',
-                    value: character.locationName,
-                    onTap: character.currentLocationId == null
-                        ? null
-                        : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (final context) => LocationListPage(
-                                  initialName: character.locationName,
-                                ),
-                              ),
-                            );
-                          },
-                  ),
-                  _buildInfoCard(
-                    context,
-                    icon: Icons.movie,
-                    title: 'Episodios',
-                    value: '${character.episodeCount}',
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Apariciones por episodio',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _EpisodesSection(episodeIds: episodeIds),
-                  const SizedBox(height: 40),
-                ]),
+                ),
               ),
-            ),
-          ],
+              SliverPadding(
+                padding: const EdgeInsets.all(16.0),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withAlpha((0.15 * 255).toInt()),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: statusColor, width: 1.5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: statusColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                character.status.displayName.toUpperCase(),
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Informacion General',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildInfoCard(
+                      context,
+                      icon: Icons.face,
+                      title: 'Especie',
+                      value: character.species,
+                    ),
+                    _buildInfoCard(
+                      context,
+                      icon: Icons.person,
+                      title: 'Genero',
+                      value: character.gender,
+                    ),
+                    _buildInfoCard(
+                      context,
+                      icon: Icons.category,
+                      title: 'Tipo',
+                      value: character.type,
+                    ),
+                    _buildInfoCard(
+                      context,
+                      icon: Icons.explore,
+                      title: 'Origen',
+                      value: character.originName,
+                      onTap: character.originLocationId == null
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (final context) => LocationListPage(
+                                    initialName: character.originName,
+                                  ),
+                                ),
+                              );
+                            },
+                    ),
+                    _buildInfoCard(
+                      context,
+                      icon: Icons.location_on,
+                      title: 'Ubicacion actual',
+                      value: character.locationName,
+                      onTap: character.currentLocationId == null
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (final context) => LocationListPage(
+                                    initialName: character.locationName,
+                                  ),
+                                ),
+                              );
+                            },
+                    ),
+                    _buildInfoCard(
+                      context,
+                      icon: Icons.movie,
+                      title: 'Episodios',
+                      value: '${character.episodeCount}',
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Apariciones por episodio',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _EpisodesSection(episodeIds: episodeIds),
+                    const SizedBox(height: 40),
+                  ]),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
