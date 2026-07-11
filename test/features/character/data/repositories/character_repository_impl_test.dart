@@ -138,7 +138,10 @@ void main() {
       expect(result.isLeft(), true);
       result.fold((final failure) {
         expect(failure, isA<ServerFailure>());
-        expect(failure.message, contains('Error fetching characters'));
+        expect(
+          failure.message,
+          'No pudimos cargar los personajes. Intentalo nuevamente.',
+        );
       }, (_) => fail('Se esperaba Left(ServerFailure)'));
     });
   });
@@ -172,7 +175,10 @@ void main() {
       expect(result.isLeft(), true);
       result.fold((final failure) {
         expect(failure, isA<CacheFailure>());
-        expect(failure.message, contains('Error reading favorite characters'));
+        expect(
+          failure.message,
+          'No pudimos cargar tu lista de favoritos. Intentalo nuevamente.',
+        );
       }, (_) => fail('Se esperaba Left(CacheFailure)'));
     });
   });
@@ -232,7 +238,10 @@ void main() {
       expect(result.isLeft(), true);
       result.fold((final failure) {
         expect(failure, isA<CacheFailure>());
-        expect(failure.message, contains('Error updating favorite character'));
+        expect(
+          failure.message,
+          'No pudimos actualizar el favorito. Intentalo nuevamente.',
+        );
       }, (_) => fail('Se esperaba Left(CacheFailure)'));
     });
   });

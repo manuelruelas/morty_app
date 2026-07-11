@@ -40,7 +40,7 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
       if (e.response?.statusCode == 404) {
         return [];
       }
-      throw Exception('Failed to load characters: ${e.message}');
+      rethrow;
     }
   }
 }
