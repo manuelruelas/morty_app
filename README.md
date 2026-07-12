@@ -306,5 +306,19 @@ Ver [USO_IA.md](USO_IA.md) para prompts concretos, casos de rechazo y qué se de
 
 ---
 
+## 📦 Entrega y Despliegue (CI/CD)
+
+Este proyecto cuenta con un flujo de integración continua gestionado por **GitHub Actions**, el cual valida automáticamente cada cambio mediante análisis estático (`flutter analyze`) y una suite completa de pruebas unitarias (`flutter test`).
+
+### 🤖 Descargar el APK de la Entrega
+
+Para probar la aplicación de inmediato en un dispositivo Android o emulador sin necesidad de clonar ni compilar el código de forma local, puedes descargar el instalador oficial listo para producción desde el apartado de lanzamientos:
+
+👉 **[Ir a la sección de Releases de la app](https://github.com/manuelruelas/morty_app/releases/tag/v1.0.0)**
+
+Una vez ahí, simplemente haz clic sobre el archivo **`apk`** en la sección de *Assets* para iniciar la descarga directa.
+
+---
+
 **Last updated**: Julio 2026  
 **Autor**: Manuel Ruelas  
