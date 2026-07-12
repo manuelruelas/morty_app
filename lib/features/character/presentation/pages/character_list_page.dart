@@ -4,6 +4,7 @@ import 'package:morty_app/core/theme/theme_toggle_action.dart';
 import 'package:morty_app/features/character/domain/entities/character.dart';
 import 'package:morty_app/features/character/presentation/pages/character_detail_page.dart';
 import 'package:morty_app/features/character/presentation/widgets/character_card.dart';
+import 'package:morty_app/features/character/presentation/widgets/list/character_search_header.dart';
 
 import '../bloc/character_bloc.dart';
 import '../bloc/character_event.dart';
@@ -287,33 +288,11 @@ class _CharacterListPageState extends State<CharacterListPage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          hintText: 'Buscar personaje...',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onChanged: (final value) => _applyFilters(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    CharacterFilterButton(onOpenFilters: _openAdvancedFilters),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                CharacterFilterSummary(onClearFilters: _clearAdvancedFilters),
-              ],
-            ),
+          CharacterSearchHeader(
+            nameController: _nameController,
+            onSearchChanged: (final value) => _applyFilters(),
+            onOpenFilters: _openAdvancedFilters,
+            onClearFilters: _clearAdvancedFilters,
           ),
           const SizedBox(height: 12),
           Expanded(
@@ -421,143 +400,4 @@ class _CharacterListPageState extends State<CharacterListPage> {
       ),
     );
   }
-}
-
-class CharacterFilterButton extends StatelessWidget {
-  final VoidCallback onOpenFilters;
-
-  const CharacterFilterButton({required this.onOpenFilters, super.key});
-
-  @override
-  Widget build(final BuildContext context) {
-    return BlocSelector<CharacterBloc, CharacterState, CharacterState>(
-      selector: (final state) => state,
-      builder: (final context, final state) {
-        final hasAdvancedFilters = _hasAdvancedFilters(state);
-
-        return Badge(
-          isLabelVisible: hasAdvancedFilters,
-          label: Text('${_advancedFilterCount(state)}'),
-          child: SizedBox(
-            height: 56,
-            child: OutlinedButton(
-              onPressed: onOpenFilters,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Icon(Icons.tune),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class CharacterFilterSummary extends StatelessWidget {
-  final VoidCallback onClearFilters;
-
-  const CharacterFilterSummary({required this.onClearFilters, super.key});
-
-  @override
-  Widget build(final BuildContext context) {
-    return BlocSelector<CharacterBloc, CharacterState, CharacterState>(
-      selector: (final state) => state,
-      builder: (final context, final state) {
-        final activeFilters = _buildActiveFilterLabels(state);
-        final hasAdvancedFilters = activeFilters.isNotEmpty;
-
-        if (!hasAdvancedFilters) {
-          return const SizedBox.shrink();
-        }
-
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Filtros activos',
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: onClearFilters,
-                    child: const Text('Limpiar'),
-                  ),
-                ],
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: activeFilters
-                    .map(
-                      (final filter) => Chip(
-                        visualDensity: VisualDensity.compact,
-                        label: Text(filter),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-bool _hasAdvancedFilters(final CharacterState state) {
-  return state.currentStatusFilter != null ||
-      state.currentGenderFilter != null ||
-      state.currentSpeciesFilter.isNotEmpty ||
-      state.currentTypeFilter.isNotEmpty;
-}
-
-int _advancedFilterCount(final CharacterState state) {
-  var count = 0;
-  if (state.currentStatusFilter != null) {
-    count++;
-  }
-  if (state.currentGenderFilter != null) {
-    count++;
-  }
-  if (state.currentSpeciesFilter.isNotEmpty) {
-    count++;
-  }
-  if (state.currentTypeFilter.isNotEmpty) {
-    count++;
-  }
-  return count;
-}
-
-List<String> _buildActiveFilterLabels(final CharacterState state) {
-  final filters = <String>[];
-
-  if (state.currentStatusFilter != null) {
-    filters.add('Estado: ${state.currentStatusFilter!.displayName}');
-  }
-  if (state.currentGenderFilter != null) {
-    filters.add('Género: ${state.currentGenderFilter!.displayName}');
-  }
-  if (state.currentSpeciesFilter.isNotEmpty) {
-    filters.add('Especie: ${state.currentSpeciesFilter}');
-  }
-  if (state.currentTypeFilter.isNotEmpty) {
-    filters.add('Tipo: ${state.currentTypeFilter}');
-  }
-
-  return filters;
 }
