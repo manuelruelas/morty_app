@@ -134,8 +134,11 @@ class _LocationResidentSquareCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (final context) =>
-                CharacterDetailPage(characterId: character.id),
+            builder: (final context) => CharacterDetailPage(
+              characterId: character.id,
+              initialCharacterName: character.name,
+              initialCharacterImageUrl: character.imageUrl,
+            ),
           ),
         );
       },

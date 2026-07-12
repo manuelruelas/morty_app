@@ -401,6 +401,9 @@ class _CharacterListPageState extends State<CharacterListPage> {
                                         value: characterBloc,
                                         child: CharacterDetailPage(
                                           characterId: character.id,
+                                          initialCharacterName: character.name,
+                                          initialCharacterImageUrl:
+                                              character.imageUrl,
                                         ),
                                       ),
                                 ),
