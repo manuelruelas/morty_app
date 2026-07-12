@@ -1,0 +1,113 @@
+import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
+import 'package:morty_app/core/errors/failure_mapper.dart';
+import 'package:morty_app/core/errors/failures.dart';
+import 'package:morty_app/features/character/data/datasources/local/character_local_data_source.dart';
+import 'package:morty_app/features/character/data/datasources/remote/character_remote_data_source.dart';
+import 'package:morty_app/features/character/data/models/character_model.dart';
+import 'package:morty_app/features/character/domain/entities/character.dart';
+import 'package:morty_app/features/character/domain/repositories/character_repository.dart';
+
+@LazySingleton(as: CharacterRepository)
+class CharacterRepositoryImpl implements CharacterRepository {
+  final CharacterRemoteDataSource _remoteDataSource;
+  final CharacterLocalDataSource _localDataSource;
+
+  CharacterRepositoryImpl(this._remoteDataSource, this._localDataSource);
+
+  @override
+  Future<Either<Failure, Character>> getCharacterById({
+    required final int id,
+  }) async {
+    try {
+      final characterModel = await _remoteDataSource.getCharacterById(id: id);
+      return Right(characterModel.toEntity());
+    } catch (e) {
+      return Left(
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar el detalle del personaje. Intentalo nuevamente.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Character>>> getCharacters({
+    required final int page,
+    final String? name,
+    final CharacterStatus? status,
+    final String? species,
+    final String? type,
+    final CharacterGender? gender,
+  }) async {
+    try {
+      final statusString = status?.name;
+      final genderString = gender?.name;
+      final characters = await _remoteDataSource.getCharacters(
+        page: page,
+        name: name,
+        status: statusString,
+        species: species,
+        type: type,
+        gender: genderString,
+      );
+      final entities = characters
+          .map((final model) => model.toEntity())
+          .toList();
+      return Right(entities);
+    } catch (e) {
+      return Left(
+        FailureMapper.mapServerError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar los personajes. Intentalo nuevamente.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Character>>> getFavoriteCharacters() async {
+    try {
+      final favorites = await _localDataSource.getFavoriteCharacters();
+      return Right(favorites);
+    } catch (e) {
+      return Left(
+        FailureMapper.mapCacheError(
+          e,
+          fallbackMessage:
+              'No pudimos cargar tu lista de favoritos. Intentalo nuevamente.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> toggleFavoriteCharacter(
+    final Character character,
+  ) async {
+    try {
+      final isFavorite = await _localDataSource.isFavoriteCharacter(
+        character.id,
+      );
+
+      if (isFavorite) {
+        await _localDataSource.removeFavoriteCharacter(character.id);
+        return const Right(false);
+      }
+
+      await _localDataSource.saveFavoriteCharacter(character);
+      return const Right(true);
+    } catch (e) {
+      return Left(
+        FailureMapper.mapCacheError(
+          e,
+          fallbackMessage:
+              'No pudimos actualizar el favorito. Intentalo nuevamente.',
+        ),
+      );
+    }
+  }
+}
