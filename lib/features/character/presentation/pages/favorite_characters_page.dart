@@ -56,6 +56,8 @@ class FavoriteCharactersPage extends StatelessWidget {
                             value: characterBloc,
                             child: CharacterDetailPage(
                               characterId: character.id,
+                              initialCharacterName: character.name,
+                              initialCharacterImageUrl: character.imageUrl,
                             ),
                           ),
                         ),
