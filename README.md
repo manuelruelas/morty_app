@@ -1,6 +1,9 @@
+
 # 🟢 Morty App — Rick & Morty Character Explorer
 
 Una aplicación Flutter que permite explorar personajes de la serie **Rick and Morty** con búsqueda, filtros, paginación y navegación a detalle. Construida siguiendo **Clean Architecture** con inyección de dependencias, manejo robusto de errores y pruebas significativas.
+
+<img height="500" alt="SimulatorScreenRecording-iPhone15ProMax-2026-07-11at19 35 07-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/2b8371d7-ff64-4559-851c-10f61584beed" />
 
 ## 🎯 Características principales
 
